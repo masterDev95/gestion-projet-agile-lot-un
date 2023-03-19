@@ -13,9 +13,9 @@ public class Livre {
     /** La date de parution du livre */
     int parution;
     /** La colonne où le livre est rangé dans la bibliothèque */
-    short colonne;
+    int colonne;
     /** La rangée où le livre est rangé dans la bibliothèque */
-    short rangee;
+    int rangee;
     /** L'URL de l'image de couverture du livre */
     String urlImage;
     
@@ -88,7 +88,7 @@ public class Livre {
     /**
      * Modifie la date de parution du livre.
      *
-     * @param parution La nouvelle date de parution du livre.
+     * @param parution La date de parution du livre.
      */
     public void setParution(int parution) {
         this.parution = parution;
@@ -99,7 +99,7 @@ public class Livre {
      *
      * @return La colonne où le livre est rangé dans la bibliothèque.
      */
-    public short getColonne() {
+    public int getColonne() {
         return colonne;
     }
 
@@ -109,7 +109,7 @@ public class Livre {
      * @param colonne La nouvelle colonne où le livre est rangé dans la
      *                bibliothèque.
      */
-    public void setColonne(short colonne) {
+    public void setColonne(int colonne) {
         this.colonne = colonne;
     }
 
@@ -118,7 +118,7 @@ public class Livre {
      *
      * @return La rangée où le livre est rangé dans la bibliothèque.
      */
-    public short getRangee() {
+    public int getRangee() {
         return rangee;
     }
 
@@ -127,7 +127,7 @@ public class Livre {
      *
      * @param rangee La nouvelle rangée où le livre est rangé dans la bibliothèque.
      */
-    public void setRangee(short rangee) {
+    public void setRangee(int rangee) {
         this.rangee = rangee;
     }
 
