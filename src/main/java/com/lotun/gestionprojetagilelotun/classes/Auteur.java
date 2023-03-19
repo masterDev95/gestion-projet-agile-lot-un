@@ -8,16 +8,8 @@ public class Auteur {
     String nom;
     /** Le prénom de l'auteur */
     String prenom;
-
-    /**
-     * Constructeur de la classe Auteur.
-     *
-     * @param nom    Le nom de l'auteur.
-     * @param prenom Le prénom de l'auteur.
-     */
-    public Auteur(String nom, String prenom) {
-        this.nom = nom;
-        this.prenom = prenom;
+    
+    public Auteur() {
     }
 
     /**

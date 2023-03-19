@@ -18,27 +18,8 @@ public class Livre {
     short rangee;
     /** L'URL de l'image de couverture du livre */
     String urlImage;
-
-    /**
-     * Crée une nouvelle instance de Livre avec les informations spécifiées.
-     *
-     * @param titre        Le titre du livre.
-     * @param auteur       L'auteur du livre.
-     * @param presentation La présentation du livre.
-     * @param parution     La date de parution du livre.
-     * @param colonne      La colonne où le livre est rangé dans la bibliothèque.
-     * @param rangee       La rangée où le livre est rangé dans la bibliothèque.
-     * @param urlImage     L'URL de l'image de couverture du livre.
-     */
-    public Livre(String titre, Auteur auteur, String presentation, int parution, short colonne, short rangee,
-            String urlImage) {
-        this.titre = titre;
-        this.auteur = auteur;
-        this.presentation = presentation;
-        this.parution = parution;
-        this.colonne = colonne;
-        this.rangee = rangee;
-        this.urlImage = urlImage;
+    
+    public Livre() {
     }
 
     /**
