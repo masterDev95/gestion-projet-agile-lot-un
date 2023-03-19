@@ -33,4 +33,21 @@ public class BibliothequeDAO {
             return null;
         }
     }
+
+    /**
+     * Met à jour le fichier XML de la bibliothèque avec les données de la bibliothèque mise à jour.
+     *
+     * @param bibliotheque La bibliothèque mise à jour.
+     */
+    public static void updateBibliotheque(Bibliotheque bibliotheque) {
+        try {
+            // Enregistrer la liste mise à jour dans le fichier XML
+            JAXBContext context = JAXBContext.newInstance(Bibliotheque.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(bibliotheque, new File("src/main/resources/com/lotun/gestionprojetagilelotun/Biblio.xml"));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
 }
