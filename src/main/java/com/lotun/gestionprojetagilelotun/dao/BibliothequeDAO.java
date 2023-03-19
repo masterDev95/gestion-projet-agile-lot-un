@@ -1,12 +1,9 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
 
-import com.lotun.gestionprojetagilelotun.classes.Livre;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
