@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="480.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.lotun.gestionprojetagilelotun.controllers.MainController">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="Fichier">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#openFile" text="Ouvrir" />
+            <MenuItem mnemonicParsing="false" onAction="#quitApplication" text="Quitter" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#saveFile" text="Sauvegarder" />
+            <MenuItem mnemonicParsing="false" onAction="#saveAsFile" text="Sauvegarder sous..." />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="About">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#showInfo" text="Infos" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefWidth="680.0" VBox.vgrow="ALWAYS">
+         <children>
+            <TableView fx:id="tableViewLivres" layoutX="14.0" layoutY="14.0" prefHeight="344.0" prefWidth="594.0">
+              <columns>
+                <TableColumn prefWidth="128.0" text="Titre" />
+                <TableColumn prefWidth="132.79998779296875" text="Auteur" />
+                  <TableColumn prefWidth="151.20001220703125" text="Présentation" />
+                  <TableColumn prefWidth="71.99993896484375" text="Parution" />
+                  <TableColumn minWidth="4.800048828125" prefWidth="57.5999755859375" text="Colonne" />
+                  <TableColumn prefWidth="51.199951171875" text="Rangée" />
+              </columns>
+            </TableView>
+            <Button layoutX="499.0" layoutY="395.0" mnemonicParsing="false" onAction="#creerLivre" prefWidth="37.0" text="+" />
+            <Button layoutX="552.0" layoutY="395.0" mnemonicParsing="false" onAction="#supprimerLivre" prefHeight="26.0" prefWidth="47.0" text="-" />
+            <Pane layoutX="629.0" layoutY="14.0" prefHeight="352.0" prefWidth="254.0">
+               <children>
+                  <HBox layoutX="14.0" layoutY="14.0" prefHeight="26.0" prefWidth="228.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label prefHeight="24.0" prefWidth="56.0" text="Titre">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets bottom="3.0" top="3.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="245.0" prefWidth="166.0">
+                           <children>
+                              <TextField fx:id="champTitre" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" />
+                     </padding>
+                  </HBox>
+                  <TitledPane animated="false" layoutX="14.0" layoutY="50.0" prefHeight="109.0" prefWidth="228.0" text="Auteur">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="226.0">
+                           <children>
+                              <HBox layoutX="13.0" layoutY="14.0" prefHeight="0.0" prefWidth="200.0">
+                                 <children>
+                                    <VBox prefHeight="100.0" prefWidth="62.0" spacing="5.0">
+                                       <children>
+                                          <Label prefHeight="24.0" prefWidth="56.0" text="Prénom">
+                                             <padding>
+                                                <Insets bottom="3.0" top="3.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label prefHeight="24.0" prefWidth="56.0" text="Nom">
+                                             <padding>
+                                                <Insets bottom="3.0" top="3.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="100.0" prefWidth="140.0" spacing="5.0">
+                                       <children>
+                                          <TextField fx:id="champPrenomAuteur" />
+                                          <TextField fx:id="champNomAuteur" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <HBox layoutX="14.0" layoutY="172.0" prefHeight="71.0" prefWidth="228.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0">
+                           <children>
+                              <Label prefHeight="24.0" prefWidth="74.0" text="Présentation">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets bottom="3.0" top="3.0" />
+                                 </padding>
+                              </Label>
+                              <Label prefHeight="24.0" prefWidth="74.0" text="Parution">
+                                 <padding>
+                                    <Insets bottom="3.0" top="3.0" />
+                                 </padding>
+                              </Label>
+                              <Label prefHeight="24.0" prefWidth="74.0" text="Colonne">
+                                 <padding>
+                                    <Insets bottom="3.0" top="3.0" />
+                                 </padding>
+                              </Label>
+                              <Label prefHeight="24.0" prefWidth="74.0" text="Rangée">
+                                 <padding>
+                                    <Insets bottom="3.0" top="3.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="245.0" prefWidth="166.0" spacing="8.0">
+                           <children>
+                              <TextField fx:id="champPresentation" />
+                              <TextField fx:id="champParution" />
+                              <TextField fx:id="champColonne" />
+                              <TextField fx:id="champRangee" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" />
+                     </padding>
+                  </HBox>
+                  <Button onAction="#modifierLivre" layoutX="188.0" layoutY="313.0" mnemonicParsing="false" text="Valider" />
+               </children>
+            </Pane>
+         </children>
+    </AnchorPane>
+  </children>
+</VBox>
