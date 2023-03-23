@@ -13,18 +13,22 @@ import jakarta.xml.bind.Unmarshaller;
  * Classe permettant l'accès aux données de la bibliothèque stockées dans un fichier XML.
  */
 public class BibliothequeDAO {
+    File fichierXML;
+
+    public BibliothequeDAO(File fichier) {
+        fichierXML = fichier;
+    }
+
     /**
      * Récupère la bibliothèque à partir du fichier XML.
      *
      * @return La bibliothèque, ou null en cas d'erreur.
      */
-    public static Bibliotheque getBibliotheque() {
+    public Bibliotheque getBibliotheque() {
         try {
             JAXBContext context = JAXBContext.newInstance(Bibliotheque.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            File fichierXML = new File("src/main/resources/com/lotun/gestionprojetagilelotun/Biblio.xml");
-            Bibliotheque bibliotheque = (Bibliotheque) unmarshaller.unmarshal(fichierXML);
-            return bibliotheque;
+            return (Bibliotheque) unmarshaller.unmarshal(fichierXML);
         } catch (JAXBException e) {
             e.printStackTrace();
             return null;
@@ -36,13 +40,13 @@ public class BibliothequeDAO {
      *
      * @param bibliotheque La bibliothèque mise à jour.
      */
-    public static void updateBibliotheque(Bibliotheque bibliotheque) {
+    public void updateBibliotheque(Bibliotheque bibliotheque) {
         try {
             // Enregistrer la liste mise à jour dans le fichier XML
             JAXBContext context = JAXBContext.newInstance(Bibliotheque.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(bibliotheque, new File("src/main/resources/com/lotun/gestionprojetagilelotun/Biblio.xml"));
+            marshaller.marshal(bibliotheque, fichierXML);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
