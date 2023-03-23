@@ -153,6 +153,8 @@ public class MainController {
                     champRangee.setText(Integer.toString(newValue.getRangee()));
                 }
             });
+
+            clearChamps();
         }
     }
 
@@ -177,14 +179,34 @@ public class MainController {
 
             // Mettre à jour la bibliothèque dans le fichier XML en utilisant l'objet DAO
             dao.updateBibliotheque(nvBibliotheque);
+        } else {
+            saveAsFile();
         }
     }
 
     /**
-     * Enregistre un fichier sous un nom donné.
+     * Enregistre un fichier sous un nom donné en utilisant un FileChooser pour choisir le chemin et le nom du fichier.
+     * <p>
+     * Si la bibliothèque a déjà été enregistrée auparavant, le FileChooser s'ouvre avec le chemin du fichier actuel comme répertoire initial.
+     * <p>
+     * Si la bibliothèque n'a pas été enregistrée auparavant, le FileChooser s'ouvre avec le répertoire du programme comme répertoire initial.
+     * <p>
+     * Si un fichier est sélectionné, la méthode crée un nouveau BibliothequeDAO pour le fichier sélectionné et appelle la méthode saveFile() pour enregistrer la bibliothèque dans ce fichier.
      */
     @FXML
     protected void saveAsFile() {
+        String defaultPath = dao == null ? System.getProperty("user.dir") : dao.getFichierXML().getParent();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(defaultPath));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", "*.xml"));
+
+        File selectedFile = fileChooser.showSaveDialog(null);
+
+        if (selectedFile != null) {
+            dao = new BibliothequeDAO(selectedFile);
+            saveFile();
+        }
     }
 
     /**
@@ -200,14 +222,7 @@ public class MainController {
     @FXML
     protected void creerLivre() {
         tableViewLivres.getSelectionModel().clearSelection();
-            // Récupération des données modifiées dans les champs de texte
-            champTitre.setText("");
-            champNomAuteur.setText("");
-            champPrenomAuteur.setText("");
-            champPresentation.setText("");
-            champParution.setText("");
-            champColonne.setText("");
-            champRangee.setText("");
+        clearChamps();
     }
 
     /**
@@ -221,18 +236,11 @@ public class MainController {
         if (selectedIndex != -1) {
             // Création d'un nouvel objet Livre
             tableViewLivres.getItems().remove(selectedIndex);
-            //Enleve la selection de l'element
+            // Enlève la selection de l'élément
             tableViewLivres.getSelectionModel().clearSelection();
             // Mise à jour de l'affichage dans le TableView
-            
             tableViewLivres.refresh();
-            champTitre.setText("");
-            champNomAuteur.setText("");
-            champPrenomAuteur.setText("");
-            champPresentation.setText("");
-            champParution.setText("");
-            champColonne.setText("");
-            champRangee.setText("");
+            clearChamps();
         }
     }
 
@@ -264,8 +272,7 @@ public class MainController {
 
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
-        }
-        else {
+        } else {
             Livre livre = new Livre();
             Auteur auteur = new Auteur();
             auteur.setNom(champNomAuteur.getText());
@@ -279,6 +286,13 @@ public class MainController {
             livre.setRangee(Integer.parseInt(champRangee.getText()));
             tableViewLivres.getItems().add(livre);
         }
+        clearChamps();
+    }
+
+    /**
+     * Efface le contenu des champs de saisie
+     */
+    private void clearChamps() {
         champTitre.setText("");
         champNomAuteur.setText("");
         champPrenomAuteur.setText("");
