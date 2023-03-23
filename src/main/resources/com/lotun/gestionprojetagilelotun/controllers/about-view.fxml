@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="407.0" prefWidth="703.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.lotun.gestionprojetagilelotun.controllers.AboutController">
+    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="112.0">
+        <ImageView fitHeight="214.0" fitWidth="253.0" pickOnBounds="true" preserveRatio="true" fx:id="imageAlexis">
+        </ImageView>
+        <ImageView fitHeight="214.0" fitWidth="253.0" pickOnBounds="true" preserveRatio="true" fx:id="imageKelvin">
+        </ImageView>
+    </HBox>
+    <HBox alignment="CENTER" prefHeight="118.0" prefWidth="703.0">
+        <VBox alignment="CENTER" prefHeight="126.0" prefWidth="327.0">
+            <Label text="Alexis Ottina">
+                <font>
+                    <Font size="18.0"/>
+                </font>
+            </Label>
+            <Label text="Etudiant et développeur d'application et web full stack">
+                <font>
+                    <Font size="13.0"/>
+                </font>
+            </Label>
+        </VBox>
+        <VBox alignment="CENTER" prefHeight="126.0" prefWidth="327.0">
+            <Label text="Kelvin Sudrot">
+                <font>
+                    <Font size="18.0"/>
+                </font>
+            </Label>
+            <Label text="Etudiant et développeur web full stack">
+                <font>
+                    <Font size="13.0"/>
+                </font>
+            </Label>
+        </VBox>
+    </HBox>
+</VBox>

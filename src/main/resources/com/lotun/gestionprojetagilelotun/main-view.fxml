@@ -59,7 +59,7 @@
             <MenuItem mnemonicParsing="false" onAction="#saveAsFile" text="Sauvegarder sous..."/>
         </Menu>
         <Menu mnemonicParsing="false" text="About">
-            <MenuItem mnemonicParsing="false" onAction="#showInfo" text="Infos"/>
+            <MenuItem mnemonicParsing="false" onAction="#showAbout" text="Infos"/>
         </Menu>
     </MenuBar>
     <AnchorPane prefWidth="680.0" VBox.vgrow="ALWAYS">
