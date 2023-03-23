@@ -224,7 +224,15 @@ public class MainController {
             //Enleve la selection de l'element
             tableViewLivres.getSelectionModel().clearSelection();
             // Mise à jour de l'affichage dans le TableView
+            
             tableViewLivres.refresh();
+            champTitre.setText("");
+            champNomAuteur.setText("");
+            champPrenomAuteur.setText("");
+            champPresentation.setText("");
+            champParution.setText("");
+            champColonne.setText("");
+            champRangee.setText("");
         }
     }
 
@@ -271,5 +279,12 @@ public class MainController {
             livre.setRangee(Integer.parseInt(champRangee.getText()));
             tableViewLivres.getItems().add(livre);
         }
+        champTitre.setText("");
+        champNomAuteur.setText("");
+        champPrenomAuteur.setText("");
+        champPresentation.setText("");
+        champParution.setText("");
+        champColonne.setText("");
+        champRangee.setText("");
     }
 }
