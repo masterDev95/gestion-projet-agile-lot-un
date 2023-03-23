@@ -169,6 +169,15 @@ public class MainController {
      */
     @FXML
     protected void saveFile() {
+        // Vérifier que l'objet DAO a été initialisé
+        if (dao != null) {
+            // Créer une nouvelle bibliothèque avec les livres de la tableview
+            var nvBibliotheque = new Bibliotheque();
+            nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
+
+            // Mettre à jour la bibliothèque dans le fichier XML en utilisant l'objet DAO
+            dao.updateBibliotheque(nvBibliotheque);
+        }
     }
 
     /**

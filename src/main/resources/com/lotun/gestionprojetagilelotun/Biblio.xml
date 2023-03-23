@@ -45,4 +45,15 @@
         <titre>Modena</titre>
         <urlImage>https://i.imgur.com/vvSAqrT.jpeg</urlImage>
     </livre>
+    <livre>
+        <auteur>
+            <nom>Carrion</nom>
+            <prenom>Ryan</prenom>
+        </auteur>
+        <colonne>5</colonne>
+        <parution>2020</parution>
+        <presentation>Hmmmm</presentation>
+        <rangee>7</rangee>
+        <titre>Hmmm</titre>
+    </livre>
 </bibliotheque>
