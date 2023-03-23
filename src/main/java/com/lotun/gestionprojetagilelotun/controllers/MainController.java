@@ -9,15 +9,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Contrôleur principal pour la gestion de livres.
@@ -273,18 +273,21 @@ public class MainController {
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
         } else {
-            Livre livre = new Livre();
-            Auteur auteur = new Auteur();
-            auteur.setNom(champNomAuteur.getText());
-            auteur.setPrenom(champPrenomAuteur.getText());
+            boolean check = checkChamps();
+            if(check == false){
+                Livre livre = new Livre();
+                Auteur auteur = new Auteur();
+                auteur.setNom(champNomAuteur.getText());
+                auteur.setPrenom(champPrenomAuteur.getText());
 
-            livre.setTitre(champTitre.getText());
-            livre.setAuteur(auteur);
-            livre.setPresentation(champPresentation.getText());
-            livre.setParution(Integer.parseInt(champParution.getText()));
-            livre.setColonne(Integer.parseInt(champColonne.getText()));
-            livre.setRangee(Integer.parseInt(champRangee.getText()));
-            tableViewLivres.getItems().add(livre);
+                livre.setTitre(champTitre.getText());
+                livre.setAuteur(auteur);
+                livre.setPresentation(champPresentation.getText());
+                livre.setParution(Integer.parseInt(champParution.getText()));
+                livre.setColonne(Integer.parseInt(champColonne.getText()));
+                livre.setRangee(Integer.parseInt(champRangee.getText()));
+                tableViewLivres.getItems().add(livre);
+            }
         }
         clearChamps();
     }
@@ -301,4 +304,52 @@ public class MainController {
         champColonne.setText("");
         champRangee.setText("");
     }
+
+    @FXML
+    void showDialog(String contentErreure){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Erreure");
+        alert.setContentText(contentErreure);
+        Optional<ButtonType> result = alert.showAndWait();
+
+    }
+
+    @FXML
+    private boolean checkChamps() {
+        Date dt=new Date();
+        int year=dt.getYear();
+        System.out.println("Year for date object is : "+year);
+        int current_Year=year+1900;
+        System.out.println("Current year is : "+current_Year);
+
+
+        if(champTitre.getText().isEmpty()){
+            showDialog("Le champs titre est vide");
+            return true;
+        } else if (champPrenomAuteur.getText().isEmpty()) {
+            showDialog("Le champs PrenomAuteur est vide");
+            return true;
+        } else if (champNomAuteur.getText().isEmpty()) {
+            showDialog("Le champs NomAuteur est vide");
+            return true;
+        } else if (champPresentation.getText().isEmpty()) {
+            showDialog("Le champs Presentation est vide");
+            return true;
+        } else if (Integer.parseInt(champParution.getText()) == current_Year || champParution.getText().isEmpty()) {
+            showDialog("Le champs parution est invalide");
+            return true;
+        }else if (champColonne.getText().isEmpty()) {
+            showDialog("Le champs colonne est vide");
+            return true;
+        } else if (champRangee.getText().isEmpty()) {
+            showDialog("Le champs rangée est vide");
+        }
+
+        return false;
+
+    }
+
+
+
+
 }
