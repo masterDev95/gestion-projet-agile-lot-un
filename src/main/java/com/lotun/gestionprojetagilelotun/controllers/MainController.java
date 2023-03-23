@@ -169,6 +169,15 @@ public class MainController {
      */
     @FXML
     protected void creerLivre() {
+        tableViewLivres.getSelectionModel().clearSelection();
+            // Récupération des données modifiées dans les champs de texte
+            champTitre.setText("");
+            champNomAuteur.setText("");
+            champPrenomAuteur.setText("");
+            champPresentation.setText("");
+            champParution.setText("");
+            champColonne.setText("");
+            champRangee.setText("");
     }
 
     /**
@@ -176,11 +185,23 @@ public class MainController {
      */
     @FXML
     protected void supprimerLivre() {
+        // Récupération de l'index de l'élément sélectionné
+        int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
+        // Vérification qu'un élément est bien sélectionné
+        if (selectedIndex != -1) {
+            // Création d'un nouvel objet Livre
+            tableViewLivres.getItems().remove(selectedIndex);
+            //Enleve la selection de l'element
+            tableViewLivres.getSelectionModel().clearSelection();
+            // Mise à jour de l'affichage dans le TableView
+            tableViewLivres.refresh();
+        }
     }
 
     /**
      * Modifie le livre sélectionné.
      */
+
     @FXML
     protected void modifierLivre() {
         // Récupération de l'index de l'élément sélectionné
@@ -205,6 +226,20 @@ public class MainController {
 
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
+        }
+        else {
+            Livre livre = new Livre();
+            Auteur auteur = new Auteur();
+            auteur.setNom(champNomAuteur.getText());
+            auteur.setPrenom(champPrenomAuteur.getText());
+
+            livre.setTitre(champTitre.getText());
+            livre.setAuteur(auteur);
+            livre.setPresentation(champPresentation.getText());
+            livre.setParution(Integer.parseInt(champParution.getText()));
+            livre.setColonne(Integer.parseInt(champColonne.getText()));
+            livre.setRangee(Integer.parseInt(champRangee.getText()));
+            tableViewLivres.getItems().add(livre);
         }
     }
 }
