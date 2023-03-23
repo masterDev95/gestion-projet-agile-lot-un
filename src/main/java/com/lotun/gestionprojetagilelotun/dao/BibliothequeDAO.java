@@ -19,6 +19,14 @@ public class BibliothequeDAO {
         fichierXML = fichier;
     }
 
+    public File getFichierXML() {
+        return fichierXML;
+    }
+
+    public void setFichierXML(File fichier) {
+        fichierXML = fichier;
+    }
+
     /**
      * Récupère la bibliothèque à partir du fichier XML.
      *
