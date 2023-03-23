@@ -4,6 +4,8 @@ module com.lotun.gestionprojetagilelotun {
     requires jakarta.xml.bind;
 
     opens com.lotun.gestionprojetagilelotun to javafx.fxml;
+    opens com.lotun.gestionprojetagilelotun.controllers to javafx.fxml;
+    opens com.lotun.gestionprojetagilelotun.classes to jakarta.xml.bind, javafx.base;
     exports com.lotun.gestionprojetagilelotun;
-    opens com.lotun.gestionprojetagilelotun.classes to jakarta.xml.bind;
+    exports com.lotun.gestionprojetagilelotun.controllers;
 }

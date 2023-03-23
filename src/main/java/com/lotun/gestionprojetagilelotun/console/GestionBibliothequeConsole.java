@@ -40,23 +40,12 @@ public class GestionBibliothequeConsole {
             String choix = scanner.nextLine();
 
             switch (choix) {
-                case "1":
-                    afficherListeLivres(bibliotheque);
-                    break;
-                case "2":
-                    ajouterLivre(bibliotheque, scanner);
-                    break;
-                case "3":
-                    modifierLivre(bibliotheque, scanner);
-                    break;
-                case "4":
-                    supprimerLivre(bibliotheque, scanner);
-                    break;
-                case "5":
-                    quitter = true;
-                    break;
-                default:
-                    System.out.println("Choix invalide.");
+                case "1" -> afficherListeLivres(bibliotheque);
+                case "2" -> ajouterLivre(bibliotheque, scanner);
+                case "3" -> modifierLivre(bibliotheque, scanner);
+                case "4" -> supprimerLivre(bibliotheque, scanner);
+                case "5" -> quitter = true;
+                default -> System.out.println("Choix invalide.");
             }
         }
 
