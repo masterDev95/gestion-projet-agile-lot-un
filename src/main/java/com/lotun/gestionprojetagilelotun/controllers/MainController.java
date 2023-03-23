@@ -9,13 +9,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -210,10 +215,16 @@ public class MainController {
     }
 
     /**
-     * Affiche les informations sur le livre sélectionné.
+     * Affiche la fenêtre "à propos" des développeurs.
      */
     @FXML
-    protected void showInfo() {
+    protected void showAbout() throws IOException {
+        System.out.println(getClass().getResource("about-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("about-view.fxml"));
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     /**
