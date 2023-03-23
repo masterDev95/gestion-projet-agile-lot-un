@@ -1,5 +1,6 @@
 package com.lotun.gestionprojetagilelotun.console;
 
+import java.io.File;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,7 +20,9 @@ public class GestionBibliothequeConsole {
      */
     public static void main(String[] args) {
         // Récupérer la bibliothèque depuis le fichier XML
-        Bibliotheque bibliotheque = BibliothequeDAO.getBibliotheque();
+        File file = new File("src/main/resources/com/lotun/gestionprojetagilelotun/main-view.fxml");
+        BibliothequeDAO dao = new BibliothequeDAO(file);
+        Bibliotheque bibliotheque = dao.getBibliotheque();
 
         if (bibliotheque == null) {
             System.out.println("Impossible de charger la bibliothèque.");
@@ -50,7 +53,7 @@ public class GestionBibliothequeConsole {
         }
 
         // Mettre à jour le fichier XML de la bibliothèque avant de quitter
-        BibliothequeDAO.updateBibliotheque(bibliotheque);
+        dao.updateBibliotheque(bibliotheque);
     }
 
     /**

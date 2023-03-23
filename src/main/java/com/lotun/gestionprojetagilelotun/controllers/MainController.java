@@ -1,6 +1,7 @@
 package com.lotun.gestionprojetagilelotun.controllers;
 
 import com.lotun.gestionprojetagilelotun.classes.Auteur;
+import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
 import com.lotun.gestionprojetagilelotun.classes.Livre;
 import com.lotun.gestionprojetagilelotun.dao.BibliothequeDAO;
 import javafx.application.Platform;
@@ -12,7 +13,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,9 +85,10 @@ public class MainController {
     @FXML
     private List<Livre> listesLivres;
 
+    private BibliothequeDAO dao;
+
     @FXML
     private void initialize() {
-        listesLivres = Objects.requireNonNull(BibliothequeDAO.getBibliotheque()).getLivres();
         initializeTableView();
     }
 
@@ -106,33 +110,50 @@ public class MainController {
             String nomPrenom = auteur.getNom() + " " + auteur.getPrenom();
             return new SimpleStringProperty(nomPrenom);
         });
-
-        // Créer une liste observable de livres à partir des livres de la bibliothèque
-        ObservableList<Livre> livres = FXCollections.observableArrayList(listesLivres);
-
-        // Configurer le TableView pour afficher les données de la liste observable de livres
-        tableViewLivres.setItems(livres);
-
-        // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
-        tableViewLivres.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            // Vérifier que la nouvelle valeur sélectionnée
-            if (newValue != null) {
-                champTitre.setText(newValue.getTitre());
-                champNomAuteur.setText(newValue.getAuteur().getNom());
-                champPrenomAuteur.setText(newValue.getAuteur().getPrenom());
-                champPresentation.setText(newValue.getPresentation());
-                champParution.setText(Integer.toString(newValue.getParution()));
-                champColonne.setText(Integer.toString(newValue.getColonne()));
-                champRangee.setText(Integer.toString(newValue.getRangee()));
-            }
-        });
     }
 
     /**
-     * Ouvre un fichier.
+     * Ouvre une boîte de dialogue pour sélectionner un fichier à ouvrir. Si un fichier valide est sélectionné, il charge les données du fichier dans la liste observable de livres et les affiche dans le TableView. Il ajoute également un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée.
      */
     @FXML
     protected void openFile() {
+        // Obtenir le chemin du dossier de travail courant
+        String defaultPath = System.getProperty("user.dir");
+
+        // Configurer le FileChooser pour n'ouvrir que les fichiers XML avec l'extension .xml
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(defaultPath));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", "*.xml"));
+
+        // Ouvrir une boîte de dialogue pour sélectionner un fichier à ouvrir
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        // Vérifier si un fichier a été sélectionné
+        if (selectedFile != null) {
+            // Récupérer les livres du fichier sélectionné
+            dao = new BibliothequeDAO(selectedFile);
+            listesLivres = Objects.requireNonNull(dao.getBibliotheque()).getLivres();
+
+            // Créer une liste observable de livres à partir des livres de la bibliothèque
+            ObservableList<Livre> livres = FXCollections.observableArrayList(listesLivres);
+
+            // Configurer le TableView pour afficher les données de la liste observable de livres
+            tableViewLivres.setItems(livres);
+
+            // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
+            tableViewLivres.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                // Vérifier la nouvelle valeur sélectionnée
+                if (newValue != null) {
+                    champTitre.setText(newValue.getTitre());
+                    champNomAuteur.setText(newValue.getAuteur().getNom());
+                    champPrenomAuteur.setText(newValue.getAuteur().getPrenom());
+                    champPresentation.setText(newValue.getPresentation());
+                    champParution.setText(Integer.toString(newValue.getParution()));
+                    champColonne.setText(Integer.toString(newValue.getColonne()));
+                    champRangee.setText(Integer.toString(newValue.getRangee()));
+                }
+            });
+        }
     }
 
     /**
