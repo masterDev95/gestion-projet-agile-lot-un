@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,9 +18,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import java.io.File;
-import java.util.Date;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +30,10 @@ import java.util.Optional;
  * Contrôleur principal pour la gestion de livres.
  */
 public class MainController {
+    // Constantes
+    private static final String USER_DIR = "user.dir";
+    private static final String FILE_EXTENSION = "*.xml";
+    private static final String DEFAULT_IMAGE_PATH = "image-non-disponible.jpg";
     /**
      * Tableau des livres.
      */
@@ -70,55 +74,46 @@ public class MainController {
      */
     @FXML
     private TextField champRangee;
-
     /**
      * Colonne du titre du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colTitre;
-
     /**
      * Colonne de l'auteur du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colAuteur;
-
     /**
      * Colonne de la présentation du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colPresentation;
-
     /**
      * Colonne de la parution du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colParution;
-
     /**
      * Colonne de la colonne du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colColonne;
-
     /**
      * Colonne de la rangée du livre dans le tableau.
      */
     @FXML
     private TableColumn<Livre, String> colRangee;
-
     /**
      * Liste des livres de la bibliothèque.
      */
     @FXML
     private List<Livre> listesLivres;
-
     /**
      * Vue image de couverture du livre sélectionné dans le tableau.
      */
     @FXML
     private ImageView bookCoverImageView;
-
     /**
      * Accès aux opérations sur la base de données.
      */
@@ -196,7 +191,7 @@ public class MainController {
                     if (newValue.getUrlImage() != null) {
                         bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
                     } else {
-                        bookCoverImageView.setImage(new Image(getClass().getResource("image-non-disponible.jpg").toString()));
+                        bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
                     }
                 }
             });
@@ -297,53 +292,63 @@ public class MainController {
     }
 
     /**
-     * Modifie le livre sélectionné.
+     * Méthode qui permet de modifier un livre existant dans la bibliothèque.
+     * Récupère l'index de l'élément sélectionné dans le TableView des livres,
+     * vérifie si un élément est bien sélectionné et met à jour l'affichage dans le TableView.
+     * Si aucun élément n'est sélectionné, vérifie que tous les champs sont remplis correctement
+     * avant de mettre à jour l'affichage dans le TableView. Enfin, vide les champs.
      */
-
-    @FXML
     protected void modifierLivre() {
         // Récupération de l'index de l'élément sélectionné
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
         // Vérification qu'un élément est bien sélectionné
         if (selectedIndex != -1) {
-            // Création d'un nouvel objet Livre
-            var livreModifie = tableViewLivres.getSelectionModel().getSelectedItem();
-            // Création d'un nouvel objet Auteur
-            var auteur = new Auteur();
-
-            // Récupération des données modifiées dans les champs de texte
-            auteur.setNom(champNomAuteur.getText());
-            auteur.setPrenom(champPrenomAuteur.getText());
-
-            livreModifie.setTitre(champTitre.getText());
-            livreModifie.setAuteur(auteur);
-            livreModifie.setPresentation(champPresentation.getText());
-            livreModifie.setParution(Integer.parseInt(champParution.getText()));
-            livreModifie.setColonne(Integer.parseInt(champColonne.getText()));
-            livreModifie.setRangee(Integer.parseInt(champRangee.getText()));
-
+            updateLivreTableView();
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
         } else {
-            boolean check = checkChamps();
-            if(check == false){
-                Livre livre = new Livre();
-                Auteur auteur = new Auteur();
-                auteur.setNom(champNomAuteur.getText());
-                auteur.setPrenom(champPrenomAuteur.getText());
-
-                livre.setTitre(champTitre.getText());
-                livre.setAuteur(auteur);
-                livre.setPresentation(champPresentation.getText());
-                livre.setParution(Integer.parseInt(champParution.getText()));
-                livre.setColonne(Integer.parseInt(champColonne.getText()));
-                livre.setRangee(Integer.parseInt(champRangee.getText()));
-                tableViewLivres.getItems().add(livre);
+            if (!checkChamps()) {
+                // Si tous les champs sont remplis correctement, mise à jour de l'affichage dans le TableView
+                updateLivreTableView();
+            } else {
+                // Sinon, retourne
+                return;
             }
         }
+        // Vide les champs
         clearChamps();
     }
 
+    /**
+     * Cette méthode met à jour les données du livre sélectionné dans le TableView.
+     * Elle récupère les données modifiées dans les champs de texte et les assigne à l'objet Livre correspondant.
+     *
+     * @throws NumberFormatException si le texte dans les champs Parution, Colonne et Rangée ne peut pas être converti en entier.
+     */
+    private void updateLivreTableView() {
+        // Création d'un nouvel objet Livre
+        var livreModifie = tableViewLivres.getSelectionModel().getSelectedItem();
+        // Création d'un nouvel objet Auteur
+        var auteur = new Auteur();
+
+        // Récupération des données modifiées dans les champs de texte
+        auteur.setNom(champNomAuteur.getText());
+        auteur.setPrenom(champPrenomAuteur.getText());
+
+        livreModifie.setTitre(champTitre.getText());
+        livreModifie.setAuteur(auteur);
+        livreModifie.setPresentation(champPresentation.getText());
+        livreModifie.setParution(Integer.parseInt(champParution.getText()));
+        livreModifie.setColonne(Integer.parseInt(champColonne.getText()));
+        livreModifie.setRangee(Integer.parseInt(champRangee.getText()));
+    }
+
+    /**
+     * Permet de changer l'URL de l'image d'un livre sélectionné dans le TableView.
+     * Une boîte de dialogue s'affiche pour saisir la nouvelle URL, si la saisie est valide,
+     * l'URL de l'image dans le livre sélectionné est mise à jour et l'image affichée est actualisée.
+     * Si aucun livre n'est sélectionné, un message d'erreur s'affiche.
+     */
     @FXML
     protected void changeImageURL() {
         // Récupérer le livre sélectionné dans le tableau
@@ -384,51 +389,68 @@ public class MainController {
         champRangee.setText("");
     }
 
-    @FXML
-    void showDialog(String contentErreure){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Erreure");
-        alert.setContentText(contentErreure);
-        Optional<ButtonType> result = alert.showAndWait();
-
+    /**
+     * Affiche une boîte de dialogue avec un message d'erreur.
+     *
+     * @param message le message d'erreur à afficher
+     */
+    private void showDialog(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
-    @FXML
+    /**
+     * Vérifie que tous les champs obligatoires sont remplis et valides.
+     *
+     * @return true si l'un des champs obligatoires est vide ou invalide, false sinon
+     */
     private boolean checkChamps() {
-        Date dt=new Date();
-        int year=dt.getYear();
-        System.out.println("Year for date object is : "+year);
-        int current_Year=year+1900;
-        System.out.println("Current year is : "+current_Year);
+        String titre = champTitre.getText();
+        String prenomAuteur = champPrenomAuteur.getText();
+        String nomAuteur = champNomAuteur.getText();
+        String presentation = champPresentation.getText();
+        String parution = champParution.getText();
+        String colonne = champColonne.getText();
+        String rangee = champRangee.getText();
 
+        if (titre.isEmpty()) {
+            showDialog("Le champ titre est vide");
+            return true;
+        }
 
-        if(champTitre.getText().isEmpty()){
-            showDialog("Le champs titre est vide");
+        if (prenomAuteur.isEmpty()) {
+            showDialog("Le champ PrenomAuteur est vide");
             return true;
-        } else if (champPrenomAuteur.getText().isEmpty()) {
-            showDialog("Le champs PrenomAuteur est vide");
+        }
+
+        if (nomAuteur.isEmpty()) {
+            showDialog("Le champ NomAuteur est vide");
             return true;
-        } else if (champNomAuteur.getText().isEmpty()) {
-            showDialog("Le champs NomAuteur est vide");
+        }
+
+        if (presentation.isEmpty()) {
+            showDialog("Le champ Presentation est vide");
             return true;
-        } else if (champPresentation.getText().isEmpty()) {
-            showDialog("Le champs Presentation est vide");
+        }
+
+        if (parution.isEmpty() || Integer.parseInt(parution) == LocalDate.now().getYear()) {
+            showDialog("Le champ parution est invalide");
             return true;
-        } else if (Integer.parseInt(champParution.getText()) == current_Year || champParution.getText().isEmpty()) {
-            showDialog("Le champs parution est invalide");
+        }
+
+        if (colonne.isEmpty()) {
+            showDialog("Le champ colonne est vide");
             return true;
-        }else if (champColonne.getText().isEmpty()) {
-            showDialog("Le champs colonne est vide");
+        }
+
+        if (rangee.isEmpty()) {
+            showDialog("Le champ rangée est vide");
             return true;
-        } else if (champRangee.getText().isEmpty()) {
-            showDialog("Le champs rangée est vide");
         }
 
         return false;
-
     }
-
-
-
-
 }
