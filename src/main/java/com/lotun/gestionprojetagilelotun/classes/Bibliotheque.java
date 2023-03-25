@@ -19,7 +19,10 @@ public class Bibliotheque {
      */
     @XmlElement(name = "livre")
     private List<Livre> livres;
-    
+
+    /**
+     * Classe représentant une bibliothèque contenant une liste de livres.
+     */
     public Bibliotheque() {
     }
 

@@ -18,7 +18,10 @@ public class Livre {
     int rangee;
     /** L'URL de l'image de couverture du livre */
     String urlImage;
-    
+
+    /**
+     * Cette classe représente un livre.
+     */
     public Livre() {
     }
 

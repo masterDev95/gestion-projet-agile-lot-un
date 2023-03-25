@@ -13,10 +13,10 @@ import javafx.scene.control.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -71,29 +71,63 @@ public class MainController {
     @FXML
     private TextField champRangee;
 
+    /**
+     * Colonne du titre du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colTitre;
 
+    /**
+     * Colonne de l'auteur du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colAuteur;
 
+    /**
+     * Colonne de la présentation du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colPresentation;
 
+    /**
+     * Colonne de la parution du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colParution;
 
+    /**
+     * Colonne de la colonne du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colColonne;
 
+    /**
+     * Colonne de la rangée du livre dans le tableau.
+     */
     @FXML
     private TableColumn<Livre, String> colRangee;
 
+    /**
+     * Liste des livres de la bibliothèque.
+     */
     @FXML
     private List<Livre> listesLivres;
 
+    /**
+     * Vue image de couverture du livre sélectionné dans le tableau.
+     */
+    @FXML
+    private ImageView bookCoverImageView;
+
+    /**
+     * Accès aux opérations sur la base de données.
+     */
     private BibliothequeDAO dao;
 
+    /**
+     * Méthode d'initialisation du contrôleur.
+     * Initialise le tableau de livres et définit les colonnes.
+     */
     @FXML
     private void initialize() {
         initializeTableView();
@@ -158,6 +192,12 @@ public class MainController {
                     champParution.setText(Integer.toString(newValue.getParution()));
                     champColonne.setText(Integer.toString(newValue.getColonne()));
                     champRangee.setText(Integer.toString(newValue.getRangee()));
+
+                    if (newValue.getUrlImage() != null) {
+                        bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
+                    } else {
+                        bookCoverImageView.setImage(new Image(getClass().getResource("image-non-disponible.jpg").toString()));
+                    }
                 }
             });
 
@@ -221,7 +261,6 @@ public class MainController {
      */
     @FXML
     protected void showAbout() throws IOException {
-        System.out.println(getClass().getResource("about-view.fxml"));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("about-view.fxml"));
         Parent root = loader.load();
         Stage stage = new Stage();
@@ -303,6 +342,33 @@ public class MainController {
             }
         }
         clearChamps();
+    }
+
+    @FXML
+    protected void changeImageURL() {
+        // Récupérer le livre sélectionné dans le tableau
+        Livre livreSelectionne = tableViewLivres.getSelectionModel().getSelectedItem();
+        if (livreSelectionne == null) {
+            // Aucun livre sélectionné, afficher un message d'erreur
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Aucun livre sélectionné");
+            alert.showAndWait();
+            return;
+        }
+
+        // Afficher une boîte de dialogue avec un champ de texte pour saisir la nouvelle URL
+        TextInputDialog dialog = new TextInputDialog(livreSelectionne.getUrlImage());
+        dialog.setTitle("Changer l'URL de l'image");
+        dialog.setHeaderText("Saisissez la nouvelle URL de l'image pour le livre " + livreSelectionne.getTitre());
+        dialog.setContentText("Nouvelle URL :");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent() && !result.get().equals("")) {
+            String nouvelleURL = result.get();
+            // Mettre à jour l'URL de l'image dans le livre sélectionné
+            livreSelectionne.setUrlImage(nouvelleURL);
+            // Mettre à jour l'image affichée
+            bookCoverImageView.setImage(new Image(nouvelleURL));
+        }
     }
 
     /**
