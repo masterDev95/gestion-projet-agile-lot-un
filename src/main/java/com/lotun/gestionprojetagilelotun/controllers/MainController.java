@@ -112,17 +112,25 @@ public class MainController {
     @FXML
     private List<Livre> listesLivres;
 
+    /**
+     * Vue image de couverture du livre sélectionné dans le tableau.
+     */
     @FXML
-    private void initialize() {
-        initializeTableView();
-    }
+    private ImageView bookCoverImageView;
 
     /**
      * Accès aux opérations sur la base de données.
      */
     private BibliothequeDAO dao;
 
-    public ImageView bookCoverImageView;
+    /**
+     * Méthode d'initialisation du contrôleur.
+     * Initialise le tableau de livres et définit les colonnes.
+     */
+    @FXML
+    private void initialize() {
+        initializeTableView();
+    }
 
     /**
      * Initialise le TableView avec les données de la bibliothèque et configure les cellules de chaque colonne.

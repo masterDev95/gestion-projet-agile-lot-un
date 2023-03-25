@@ -8,7 +8,10 @@ public class Auteur {
     String nom;
     /** Le prénom de l'auteur */
     String prenom;
-    
+
+    /**
+     * Représente un auteur de livre.
+     */
     public Auteur() {
     }
 
