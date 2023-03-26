@@ -23,12 +23,6 @@ public class AboutController {
     private ImageView imageKelvin;
 
     /**
-     * Le contrôleur pour la vue "à propos"
-     */
-    private AboutController() {
-    }
-
-    /**
      * Initialise le contrôleur.
      * Charge les images des auteurs dans les ImageView correspondantes.
      */
