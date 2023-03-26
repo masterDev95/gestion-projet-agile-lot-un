@@ -17,6 +17,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -169,6 +171,26 @@ public class MainController {
             String nomPrenom = auteur.getNom() + " " + auteur.getPrenom();
             return new SimpleStringProperty(nomPrenom);
         });
+
+        // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
+        tableViewLivres.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            // Vérifier la nouvelle valeur sélectionnée
+            if (newValue != null) {
+                champTitre.setText(newValue.getTitre());
+                champNomAuteur.setText(newValue.getAuteur().getNom());
+                champPrenomAuteur.setText(newValue.getAuteur().getPrenom());
+                champPresentation.setText(newValue.getPresentation());
+                champParution.setText(Integer.toString(newValue.getParution()));
+                champColonne.setText(Integer.toString(newValue.getColonne()));
+                champRangee.setText(Integer.toString(newValue.getRangee()));
+
+                if (newValue.getUrlImage() != null) {
+                    bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
+                } else {
+                    bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
+                }
+            }
+        });
     }
 
     /**
@@ -198,26 +220,6 @@ public class MainController {
 
             // Configurer le TableView pour afficher les données de la liste observable de livres
             tableViewLivres.setItems(livres);
-
-            // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
-            tableViewLivres.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                // Vérifier la nouvelle valeur sélectionnée
-                if (newValue != null) {
-                    champTitre.setText(newValue.getTitre());
-                    champNomAuteur.setText(newValue.getAuteur().getNom());
-                    champPrenomAuteur.setText(newValue.getAuteur().getPrenom());
-                    champPresentation.setText(newValue.getPresentation());
-                    champParution.setText(Integer.toString(newValue.getParution()));
-                    champColonne.setText(Integer.toString(newValue.getColonne()));
-                    champRangee.setText(Integer.toString(newValue.getRangee()));
-
-                    if (newValue.getUrlImage() != null) {
-                        bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
-                    } else {
-                        bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
-                    }
-                }
-            });
 
             clearChamps();
         }
@@ -292,6 +294,8 @@ public class MainController {
     @FXML
     protected void creerLivre() {
         tableViewLivres.getSelectionModel().clearSelection();
+        bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
+        champTitre.requestFocus();
         clearChamps();
     }
 
@@ -311,6 +315,9 @@ public class MainController {
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
             clearChamps();
+        } else {
+            // Afficher un message d'erreur si aucun élément n'est sélectionné
+            showDialog("Veuillez sélectionner un livre à supprimer.");
         }
     }
 
@@ -327,13 +334,24 @@ public class MainController {
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
         // Vérification qu'un élément est bien sélectionné
         if (selectedIndex != -1) {
-            updateLivreTableView();
+            // Création d'un nouvel objet Livre
+            var livreModifie = tableViewLivres.getSelectionModel().getSelectedItem();
+
+            updateLivreTableView(livreModifie);
+
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
         } else {
             if (!checkChamps()) {
+                // Création d'un nouvel objet Livre dans le TableView
+                var auteurTemp = new Auteur();
+                var livreTemp = new Livre();
+                livreTemp.setAuteur(auteurTemp);
+                tableViewLivres.getItems().add(livreTemp);
+                var nouveauLivre = tableViewLivres.getItems().get(tableViewLivres.getItems().toArray().length - 1);
                 // Si tous les champs sont remplis correctement, mise à jour de l'affichage dans le TableView
-                updateLivreTableView();
+                updateLivreTableView(nouveauLivre);
+                tableViewLivres.refresh();
             } else {
                 // Sinon, retourne
                 return;
@@ -349,9 +367,7 @@ public class MainController {
      *
      * @throws NumberFormatException si le texte dans les champs Parution, Colonne et Rangée ne peut pas être converti en entier.
      */
-    private void updateLivreTableView() {
-        // Création d'un nouvel objet Livre
-        var livreModifie = tableViewLivres.getSelectionModel().getSelectedItem();
+    private void updateLivreTableView(Livre livreModifie) {
         // Création d'un nouvel objet Auteur
         var auteur = new Auteur();
 
@@ -432,47 +448,78 @@ public class MainController {
      * @return true si l'un des champs obligatoires est vide ou invalide, false sinon
      */
     private boolean checkChamps() {
-        String titre = champTitre.getText();
-        String prenomAuteur = champPrenomAuteur.getText();
-        String nomAuteur = champNomAuteur.getText();
-        String presentation = champPresentation.getText();
-        String parution = champParution.getText();
-        String colonne = champColonne.getText();
-        String rangee = champRangee.getText();
+        String titre = champTitre.getText().trim();
+        String prenomAuteur = champPrenomAuteur.getText().trim();
+        String nomAuteur = champNomAuteur.getText().trim();
+        String presentation = champPresentation.getText().trim();
+        String parution = champParution.getText().trim();
+        String colonne = champColonne.getText().trim();
+        String rangee = champRangee.getText().trim();
 
         if (titre.isEmpty()) {
-            showDialog("Le champ titre est vide");
+            showDialog("Le champ titre est vide.");
+            champTitre.requestFocus();
             return true;
         }
 
         if (prenomAuteur.isEmpty()) {
-            showDialog("Le champ PrenomAuteur est vide");
+            showDialog("Le champ prénom de l'auteur est vide.");
+            champPrenomAuteur.requestFocus();
             return true;
         }
 
         if (nomAuteur.isEmpty()) {
-            showDialog("Le champ NomAuteur est vide");
+            showDialog("Le champ nom de l'auteur est vide.");
+            champNomAuteur.requestFocus();
             return true;
         }
 
         if (presentation.isEmpty()) {
-            showDialog("Le champ Presentation est vide");
+            showDialog("Le champ présentation est vide.");
+            champPresentation.requestFocus();
             return true;
         }
 
-        if (parution.isEmpty() || Integer.parseInt(parution) == LocalDate.now().getYear()) {
-            showDialog("Le champ parution est invalide");
+        if (parution.isEmpty()) {
+            showDialog("Le champ parution est vide.");
+            champParution.requestFocus();
             return true;
+        } else {
+            String anneeCourante = String.valueOf(LocalDate.now().getYear());
+            if (!parution.matches("\\d{4}")) {
+                showDialog("Le champ parution doit être une année valide (format : YYYY).");
+                champParution.requestFocus();
+                return true;
+            } else if (Integer.parseInt(parution) > Integer.parseInt(anneeCourante)) {
+                showDialog("Le champ parution doit être la même année ou antérieure à l'année courante ("
+                        + anneeCourante + ").");
+                champParution.requestFocus();
+                return true;
+            }
         }
 
         if (colonne.isEmpty()) {
-            showDialog("Le champ colonne est vide");
+            showDialog("Le champ colonne est vide.");
+            champColonne.requestFocus();
             return true;
+        } else {
+            if (!colonne.matches("\\d+")) {
+                showDialog("Le champ colonne doit être un nombre entier.");
+                champColonne.requestFocus();
+                return true;
+            }
         }
 
         if (rangee.isEmpty()) {
-            showDialog("Le champ rangée est vide");
+            showDialog("Le champ rangée est vide.");
+            champRangee.requestFocus();
             return true;
+        } else {
+            if (!rangee.matches("\\d+")) {
+                showDialog("Le champ rangée doit être un nombre entier.");
+                champRangee.requestFocus();
+                return true;
+            }
         }
 
         return false;
