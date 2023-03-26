@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -126,6 +127,28 @@ public class MainController {
     @FXML
     private void initialize() {
         initializeTableView();
+        validationFormulaireEvent();
+    }
+
+    /**
+     * Cette méthode attache un gestionnaire d'événements sur les champs de texte du formulaire
+     * pour capturer l'événement de pression de la touche "Entrée" et déclencher la méthode
+     * "modifierLivre()" lorsque la touche "Entrée" est pressée.
+     */
+    private void validationFormulaireEvent() {
+        // Création d'un tableau contenant tous les champs de texte à surveiller
+        TextField[] champsTexte = {champTitre, champNomAuteur, champPrenomAuteur, champPresentation, champParution, champColonne, champRangee};
+
+        // Ajout d'un événement pour chaque champ de texte du tableau
+        for (TextField champ : champsTexte) {
+            champ.setOnKeyPressed(event -> {
+                // Si la touche appuyée est la touche Entrée
+                if (event.getCode() == KeyCode.ENTER) {
+                    // On appelle la méthode modifierLivre
+                    modifierLivre();
+                }
+            });
+        }
     }
 
     /**
@@ -298,6 +321,7 @@ public class MainController {
      * Si aucun élément n'est sélectionné, vérifie que tous les champs sont remplis correctement
      * avant de mettre à jour l'affichage dans le TableView. Enfin, vide les champs.
      */
+    @FXML
     protected void modifierLivre() {
         // Récupération de l'index de l'élément sélectionné
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
