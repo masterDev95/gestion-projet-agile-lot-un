@@ -180,12 +180,13 @@ public class MainController {
         // Configurer la colonne "Auteur" pour afficher le nom et prénom de l'auteur
         colAuteur.setCellValueFactory(cellData -> {
             Auteur auteur = cellData.getValue().getAuteur();
-            String nomPrenom = "";
+            String nomPrenom;
             try {
                 nomPrenom = auteur.getNom() + " " + auteur.getPrenom();
-            } finally {
-                return new SimpleStringProperty(nomPrenom);
+            } catch (Exception e) {
+                nomPrenom = "";
             }
+            return new SimpleStringProperty(nomPrenom);
         });
 
         // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
@@ -246,12 +247,16 @@ public class MainController {
      * Enregistre un fichier.
      */
     @FXML
-    protected void saveFile() {
+    protected void saveFile() throws SQLException {
         // Vérifier que l'objet DAO a été initialisé
         if (dao != null) {
             // Créer une nouvelle bibliothèque avec les livres de la tableview
             var nvBibliotheque = new Bibliotheque();
             nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
+
+            if (liveMode) {
+                BibliothequeDAO.reecrireListeLivres(nvBibliotheque.getLivres());
+            }
 
             // Mettre à jour la bibliothèque dans le fichier XML en utilisant l'objet DAO
             dao.updateBibliotheque(nvBibliotheque);
@@ -270,7 +275,7 @@ public class MainController {
      * Si un fichier est sélectionné, la méthode crée un nouveau BibliothequeDAO pour le fichier sélectionné et appelle la méthode saveFile() pour enregistrer la bibliothèque dans ce fichier.
      */
     @FXML
-    protected void saveAsFile() {
+    protected void saveAsFile() throws SQLException {
         String defaultPath = dao == null ? System.getProperty("user.dir") : dao.getFichierXML().getParent();
 
         FileChooser fileChooser = new FileChooser();
@@ -362,8 +367,6 @@ public class MainController {
                 // Si tous les champs sont remplis correctement, mise à jour de l'affichage dans le TableView
                 updateLivreTableView(nouveauLivre);
                 tableViewLivres.refresh();
-                var addlivreBdd = new BibliothequeDAO();
-                addlivreBdd.addLivreBd(livreTemp,auteurTemp);
             } else {
                 // Sinon, retourne
                 return;

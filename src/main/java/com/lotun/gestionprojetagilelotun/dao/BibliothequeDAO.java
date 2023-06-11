@@ -9,10 +9,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,67 +123,45 @@ public class BibliothequeDAO {
         }
     }
 
-    public void addLivreBd(Livre livre, Auteur auteur) throws SQLException {
+    public static void reecrireListeLivres(List<Livre> listeLivres) throws SQLException {
         Connection connection = ConnectionManager.getDbConnection();
-        System.out.println("L'auteur a été inséré avec l'ID : " + livre.getAuteur().getNom());
 
-        // Créer la requête SQL d'insertion de l'auteur
-        String queryAuteur = "INSERT INTO auteur (nom, prenom) VALUES (?, ?)";
+        // Supprimer tous les enregistrements de la table "livre"
+        String deleteQuery = "DELETE FROM livre";
+        PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
+        deleteStatement.executeUpdate();
+        deleteStatement.close();
 
-        // Créer un objet PreparedStatement pour exécuter la requête d'insertion de l'auteur
-        PreparedStatement statementAuteur = connection.prepareStatement(queryAuteur, Statement.RETURN_GENERATED_KEYS);
+        // Réécrire la liste des livres dans la table "livre"
+        for (Livre livre : listeLivres) {
+            // Vérifier si l'auteur existe dans la table "auteur"
+            int auteurId = AuteurDAO.getAuteurId(livre.getAuteur(), connection);
 
-        statementAuteur.setString(1, livre.getAuteur().getNom());
-        statementAuteur.setString(2, livre.getAuteur().getPrenom());
-
-        // Exécuter la requête d'insertion de l'auteur
-        int rowsAffectedAuteur = statementAuteur.executeUpdate();
-
-        int auteurId = -1;
-
-        if (rowsAffectedAuteur > 0) {
-            ResultSet generatedKeys = statementAuteur.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                auteurId = generatedKeys.getInt(1);
-            }
-            generatedKeys.close();
-        } else {
-            System.out.println("L'insertion de l'auteur a échoué.");
-        }
-
-        statementAuteur.close();
-
-        // Si l'insertion de l'auteur a réussi, insérer le livre avec l'ID de l'auteur
-        if (auteurId != -1) {
-            // Créer la requête SQL d'insertion du livre
-            String queryLivre = "INSERT INTO livre (titre, idauteur, presentation, parution, colonne, rangee) VALUES (?, ?, ?, ?, ?, ?)";
-
-            // Créer un objet PreparedStatement pour exécuter la requête d'insertion du livre
-            PreparedStatement statementLivre = connection.prepareStatement(queryLivre);
-
-            // Définir les valeurs des paramètres de la requête d'insertion du livre
-            statementLivre.setString(1, livre.getTitre());
-            statementLivre.setInt(2, auteurId);
-            statementLivre.setString(3, livre.getPresentation());
-            statementLivre.setInt(4, livre.getParution());
-            statementLivre.setInt(5, livre.getColonne());
-            statementLivre.setInt(6, livre.getRangee());
-
-            // Exécuter la requête d'insertion du livre
-            int rowsAffectedLivre = statementLivre.executeUpdate();
-
-            if (rowsAffectedLivre > 0) {
-                System.out.println("Insertion du livre réussie !");
-            } else {
-                System.out.println("L'insertion du livre a échoué.");
+            // Si l'auteur n'existe pas, l'insérer dans la table "auteur"
+            if (auteurId == -1) {
+                auteurId = AuteurDAO.insertAuteur(livre.getAuteur(), connection);
             }
 
-            statementLivre.close();
+            // Insérer le livre dans la table "livre" avec l'ID de l'auteur
+            insertLivre(livre, auteurId, connection);
         }
 
         // Fermer la connexion
         connection.close();
     }
 
-
+    private static void insertLivre(Livre livre, int auteurId, Connection connection) throws SQLException {
+        String query = "INSERT INTO livre (titre, auteurId, presentation, parution, colonne, rangee, etat, urlImage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, livre.getTitre());
+        statement.setInt(2, auteurId);
+        statement.setString(3, livre.getPresentation());
+        statement.setInt(4, livre.getParution());
+        statement.setInt(5, livre.getColonne());
+        statement.setInt(6, livre.getRangee());
+        statement.setBoolean(7, livre.getEtat());
+        statement.setString(8, livre.getUrlImage());
+        statement.executeUpdate();
+        statement.close();
+    }
 }
