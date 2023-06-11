@@ -35,6 +35,8 @@ public class BibliothequeDAO {
 
     }
 
+    public BibliothequeDAO(){}
+
     /**
      * Renvoie le fichier XML associé à l'instance de la classe BibliothequeDAO.
      *
@@ -123,4 +125,68 @@ public class BibliothequeDAO {
             e.printStackTrace();
         }
     }
+
+    public void addLivreBd(Livre livre, Auteur auteur) throws SQLException {
+        Connection connection = ConnectionManager.getDbConnection();
+        System.out.println("L'auteur a été inséré avec l'ID : " + livre.getAuteur().getNom());
+
+        // Créer la requête SQL d'insertion de l'auteur
+        String queryAuteur = "INSERT INTO auteur (nom, prenom) VALUES (?, ?)";
+
+        // Créer un objet PreparedStatement pour exécuter la requête d'insertion de l'auteur
+        PreparedStatement statementAuteur = connection.prepareStatement(queryAuteur, Statement.RETURN_GENERATED_KEYS);
+
+        statementAuteur.setString(1, livre.getAuteur().getNom());
+        statementAuteur.setString(2, livre.getAuteur().getPrenom());
+
+        // Exécuter la requête d'insertion de l'auteur
+        int rowsAffectedAuteur = statementAuteur.executeUpdate();
+
+        int auteurId = -1;
+
+        if (rowsAffectedAuteur > 0) {
+            ResultSet generatedKeys = statementAuteur.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                auteurId = generatedKeys.getInt(1);
+            }
+            generatedKeys.close();
+        } else {
+            System.out.println("L'insertion de l'auteur a échoué.");
+        }
+
+        statementAuteur.close();
+
+        // Si l'insertion de l'auteur a réussi, insérer le livre avec l'ID de l'auteur
+        if (auteurId != -1) {
+            // Créer la requête SQL d'insertion du livre
+            String queryLivre = "INSERT INTO livre (titre, idauteur, presentation, parution, colonne, rangee) VALUES (?, ?, ?, ?, ?, ?)";
+
+            // Créer un objet PreparedStatement pour exécuter la requête d'insertion du livre
+            PreparedStatement statementLivre = connection.prepareStatement(queryLivre);
+
+            // Définir les valeurs des paramètres de la requête d'insertion du livre
+            statementLivre.setString(1, livre.getTitre());
+            statementLivre.setInt(2, auteurId);
+            statementLivre.setString(3, livre.getPresentation());
+            statementLivre.setInt(4, livre.getParution());
+            statementLivre.setInt(5, livre.getColonne());
+            statementLivre.setInt(6, livre.getRangee());
+
+            // Exécuter la requête d'insertion du livre
+            int rowsAffectedLivre = statementLivre.executeUpdate();
+
+            if (rowsAffectedLivre > 0) {
+                System.out.println("Insertion du livre réussie !");
+            } else {
+                System.out.println("L'insertion du livre a échoué.");
+            }
+
+            statementLivre.close();
+        }
+
+        // Fermer la connexion
+        connection.close();
+    }
+
+
 }
