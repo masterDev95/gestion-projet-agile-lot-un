@@ -18,6 +18,7 @@ public class Livre {
     int rangee;
     /** L'URL de l'image de couverture du livre */
     String urlImage;
+    Boolean etat;
 
     /**
      * Cette classe représente un livre.
@@ -150,5 +151,13 @@ public class Livre {
      */
     public void setUrlImage(String urlImage) {
         this.urlImage = urlImage;
+    }
+
+    public Boolean getEtat() {
+        return etat;
+    }
+
+    public void setEtat(Boolean etat) {
+        this.etat = etat;
     }
 }

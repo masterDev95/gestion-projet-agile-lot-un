@@ -17,8 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -38,6 +36,12 @@ public class MainController {
     private static final String USER_DIR = "user.dir";
     private static final String FILE_EXTENSION = "*.xml";
     private static final String DEFAULT_IMAGE_PATH = "image-non-disponible.jpg";
+    @FXML
+    private Button toggleLiveBouton;
+    @FXML
+    private RadioButton boutonPrete;
+    @FXML
+    private RadioButton boutonDisponible;
     /**
      * Tableau des livres.
      */
@@ -122,6 +126,7 @@ public class MainController {
      * Accès aux opérations sur la base de données.
      */
     private BibliothequeDAO dao;
+    private Boolean liveMode;
 
     /**
      * Méthode d'initialisation du contrôleur.
@@ -129,6 +134,8 @@ public class MainController {
      */
     @FXML
     private void initialize() {
+        liveMode = false;
+
         initializeTableView();
         validationFormulaireEvent();
     }
@@ -173,8 +180,12 @@ public class MainController {
         // Configurer la colonne "Auteur" pour afficher le nom et prénom de l'auteur
         colAuteur.setCellValueFactory(cellData -> {
             Auteur auteur = cellData.getValue().getAuteur();
-            String nomPrenom = auteur.getNom() + " " + auteur.getPrenom();
-            return new SimpleStringProperty(nomPrenom);
+            String nomPrenom = "";
+            try {
+                nomPrenom = auteur.getNom() + " " + auteur.getPrenom();
+            } finally {
+                return new SimpleStringProperty(nomPrenom);
+            }
         });
 
         // Ajouter un listener à la propriété selectedItemProperty() de la selectionModel du TableView pour récupérer les données de la ligne sélectionnée
@@ -188,10 +199,11 @@ public class MainController {
                 champParution.setText(Integer.toString(newValue.getParution()));
                 champColonne.setText(Integer.toString(newValue.getColonne()));
                 champRangee.setText(Integer.toString(newValue.getRangee()));
+                (newValue.getEtat() ? boutonDisponible : boutonPrete).setSelected(true);
 
-                if (newValue.getUrlImage() != null) {
+                try {
                     bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
-                } else {
+                } catch (Exception e) {
                     bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
                 }
             }
@@ -216,17 +228,9 @@ public class MainController {
 
         // Vérifier si un fichier a été sélectionné
         if (selectedFile != null) {
-            // Récupérer les livres du fichier sélectionné
+            // Remplissage du tableau
             dao = new BibliothequeDAO(selectedFile);
-            listesLivres = Objects.requireNonNull(dao.getBibliotheque()).getLivres();
-
-            // Créer une liste observable de livres à partir des livres de la bibliothèque
-            ObservableList<Livre> livres = FXCollections.observableArrayList(listesLivres);
-
-            // Configurer le TableView pour afficher les données de la liste observable de livres
-            tableViewLivres.setItems(livres);
-
-            clearChamps();
+            remplirTableau(dao.getBibliotheque());
         }
     }
 
@@ -389,6 +393,7 @@ public class MainController {
         livreModifie.setParution(Integer.parseInt(champParution.getText()));
         livreModifie.setColonne(Integer.parseInt(champColonne.getText()));
         livreModifie.setRangee(Integer.parseInt(champRangee.getText()));
+        livreModifie.setEtat(boutonDisponible.isSelected());
     }
 
     /**
@@ -531,5 +536,28 @@ public class MainController {
         }
 
         return false;
+    }
+
+    @FXML
+    protected void toggleLiveMode() throws SQLException {
+        liveMode = !liveMode;
+        toggleLiveBouton.setText("Passer en mode " + (liveMode ? "hors-ligne" : "en ligne"));
+
+        // Remplissage du tableau
+        Bibliotheque bibliotheque = BibliothequeDAO.getBibliothequeFromDB();
+        remplirTableau(bibliotheque);
+    }
+
+    private void remplirTableau(Bibliotheque bibliotheque) {
+        // Récup les livres de la bibliothèque
+        listesLivres = Objects.requireNonNull(bibliotheque).getLivres();
+
+        // Créer une liste observable de livres à partir des livres de la bibliothèque
+        ObservableList<Livre> livres = FXCollections.observableArrayList(listesLivres);
+
+        // Configurer le TableView pour afficher les données de la liste observable de livres
+        tableViewLivres.setItems(livres);
+
+        clearChamps();
     }
 }

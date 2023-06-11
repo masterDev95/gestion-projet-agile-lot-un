@@ -10,11 +10,11 @@ import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe permettant l'accès aux données de la bibliothèque stockées dans un fichier XML.
@@ -32,12 +32,14 @@ public class BibliothequeDAO {
      */
     public BibliothequeDAO(File fichier) {
         fichierXML = fichier;
+
     }
 
     public BibliothequeDAO(){}
 
     /**
      * Renvoie le fichier XML associé à l'instance de la classe BibliothequeDAO.
+     *
      * @return le fichier XML associé à l'instance de la classe BibliothequeDAO
      */
     public File getFichierXML() {
@@ -46,6 +48,7 @@ public class BibliothequeDAO {
 
     /**
      * Modifie le fichier XML utilisé pour la sauvegarde et la lecture de la bibliothèque.
+     *
      * @param fichier le nouveau fichier XML à utiliser
      */
     public void setFichierXML(File fichier) {
@@ -66,6 +69,44 @@ public class BibliothequeDAO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Bibliotheque getBibliothequeFromDB() throws SQLException {
+        Connection connection = ConnectionManager.getDbConnection();
+        Bibliotheque bibliotheque = new Bibliotheque();
+        List<Livre> livresRecuperes = new ArrayList<>();
+
+        // Création d'une instruction SQL
+        Statement statement = connection.createStatement();
+
+        // Exécution d'une requête
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM livre");
+
+        // Traitement des résultats
+        while (resultSet.next()) {
+            // Lire les valeurs des colonnes
+            var livre = new Livre();
+            livre.setTitre(resultSet.getString("titre"));
+            livre.setParution(resultSet.getInt("parution"));
+            livre.setRangee(resultSet.getInt("rangee"));
+            livre.setColonne(resultSet.getInt("colonne"));
+            livre.setUrlImage(resultSet.getString("urlImage"));
+            livre.setAuteur(AuteurDAO.getAuteurFromDBById(resultSet.getInt("auteurId")));
+            livre.setPresentation(resultSet.getString("presentation"));
+            livre.setEtat(resultSet.getBoolean("etat"));
+
+            // Faire quelque chose avec les valeurs
+            livresRecuperes.add(livre);
+        }
+
+        bibliotheque.setLivres(livresRecuperes);
+
+        // Fermeture des ressources
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+        return bibliotheque;
     }
 
     /**
