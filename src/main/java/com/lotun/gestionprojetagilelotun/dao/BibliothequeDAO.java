@@ -1,5 +1,6 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
+import com.lotun.gestionprojetagilelotun.classes.Auteur;
 import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
 import com.lotun.gestionprojetagilelotun.classes.Livre;
 import jakarta.xml.bind.JAXBContext;
@@ -36,6 +37,7 @@ public class BibliothequeDAO {
 
     /**
      * Renvoie le fichier XML associé à l'instance de la classe BibliothequeDAO.
+     *
      * @return le fichier XML associé à l'instance de la classe BibliothequeDAO
      */
     public File getFichierXML() {
@@ -44,6 +46,7 @@ public class BibliothequeDAO {
 
     /**
      * Modifie le fichier XML utilisé pour la sauvegarde et la lecture de la bibliothèque.
+     *
      * @param fichier le nouveau fichier XML à utiliser
      */
     public void setFichierXML(File fichier) {
@@ -86,6 +89,9 @@ public class BibliothequeDAO {
             livre.setRangee(resultSet.getInt("rangee"));
             livre.setColonne(resultSet.getInt("colonne"));
             livre.setUrlImage(resultSet.getString("urlImage"));
+            livre.setAuteur(AuteurDAO.getAuteurFromDBById(resultSet.getInt("auteurId")));
+            livre.setPresentation(resultSet.getString("presentation"));
+            livre.setEtat(resultSet.getBoolean("etat"));
 
             // Faire quelque chose avec les valeurs
             livresRecuperes.add(livre);
