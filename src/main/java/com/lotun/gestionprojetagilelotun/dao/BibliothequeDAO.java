@@ -1,12 +1,19 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
 import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
+import com.lotun.gestionprojetagilelotun.classes.Livre;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe permettant l'accès aux données de la bibliothèque stockées dans un fichier XML.
@@ -24,6 +31,7 @@ public class BibliothequeDAO {
      */
     public BibliothequeDAO(File fichier) {
         fichierXML = fichier;
+
     }
 
     /**
@@ -56,6 +64,41 @@ public class BibliothequeDAO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Bibliotheque getBibliothequeFromDB() throws SQLException {
+        Connection connection = ConnectionManager.getDbConnection();
+        Bibliotheque bibliotheque = new Bibliotheque();
+        List<Livre> livresRecuperes = new ArrayList<>();
+
+        // Création d'une instruction SQL
+        Statement statement = connection.createStatement();
+
+        // Exécution d'une requête
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM livre");
+
+        // Traitement des résultats
+        while (resultSet.next()) {
+            // Lire les valeurs des colonnes
+            var livre = new Livre();
+            livre.setTitre(resultSet.getString("titre"));
+            livre.setParution(resultSet.getInt("parution"));
+            livre.setRangee(resultSet.getInt("rangee"));
+            livre.setColonne(resultSet.getInt("colonne"));
+            livre.setUrlImage(resultSet.getString("urlImage"));
+
+            // Faire quelque chose avec les valeurs
+            livresRecuperes.add(livre);
+        }
+
+        bibliotheque.setLivres(livresRecuperes);
+
+        // Fermeture des ressources
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+        return bibliotheque;
     }
 
     /**
