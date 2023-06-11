@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -147,7 +148,11 @@ public class MainController {
                 // Si la touche appuyée est la touche Entrée
                 if (event.getCode() == KeyCode.ENTER) {
                     // On appelle la méthode modifierLivre
-                    modifierLivre();
+                    try {
+                        modifierLivre();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         }
@@ -329,7 +334,8 @@ public class MainController {
      * avant de mettre à jour l'affichage dans le TableView. Enfin, vide les champs.
      */
     @FXML
-    protected void modifierLivre() {
+    protected void modifierLivre() throws SQLException {
+
         // Récupération de l'index de l'élément sélectionné
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
         // Vérification qu'un élément est bien sélectionné
@@ -352,6 +358,8 @@ public class MainController {
                 // Si tous les champs sont remplis correctement, mise à jour de l'affichage dans le TableView
                 updateLivreTableView(nouveauLivre);
                 tableViewLivres.refresh();
+                var addlivreBdd = new BibliothequeDAO();
+                addlivreBdd.addLivreBd(livreTemp,auteurTemp);
             } else {
                 // Sinon, retourne
                 return;
