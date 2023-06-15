@@ -52,7 +52,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="480.0" prefWidth="1153.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lotun.gestionprojetagilelotun.controllers.MainController">
+<VBox prefHeight="480.0" prefWidth="1153.0" xmlns="http://javafx.com/javafx/19.0.2.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lotun.gestionprojetagilelotun.controllers.MainController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="Fichier">
             <MenuItem mnemonicParsing="false" onAction="#openFile" text="Ouvrir" />
