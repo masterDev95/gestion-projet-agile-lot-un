@@ -3,6 +3,7 @@ package com.lotun.gestionprojetagilelotun.controllers;
 import com.lotun.gestionprojetagilelotun.classes.Auteur;
 import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
 import com.lotun.gestionprojetagilelotun.classes.Livre;
+import com.lotun.gestionprojetagilelotun.classes.Session;
 import com.lotun.gestionprojetagilelotun.dao.BibliothequeDAO;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -51,6 +53,13 @@ public class MainController {
     private static final String USER_DIR = "user.dir";
     private static final String FILE_EXTENSION = "*.xml";
     private static final String DEFAULT_IMAGE_PATH = "image-non-disponible.jpg";
+
+    @FXML
+    private Pane paneAjoutLivre;
+    @FXML
+    private Button buttonAdd;
+    @FXML
+    private Button buttonSup;
     @FXML
     private Button toggleLiveBouton;
     @FXML
@@ -128,6 +137,11 @@ public class MainController {
     @FXML
     private TableColumn<Livre, String> colRangee;
     /**
+     * Colonne de l'etat du livre dans le tableau.
+     */
+    @FXML
+    private  TableColumn<Livre, String> colEtat;
+    /**
      * Liste des livres de la bibliothèque.
      */
     @FXML
@@ -153,6 +167,34 @@ public class MainController {
 
         initializeTableView();
         validationFormulaireEvent();
+
+        boolean isGerant = Session.isGerant();
+
+        if(isGerant){
+            paneAjoutLivre.setVisible(true);
+        }else {
+            paneAjoutLivre.setVisible(false);
+            bookCoverImageView.setDisable(true);
+            buttonAdd.setVisible(false);
+            buttonSup.setVisible(false);
+        }
+    }
+
+    @FXML
+    protected void deconnexion() throws IOException {
+        Scene currentScene = toggleLiveBouton.getScene();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("PageConnexion.fxml"));
+        Parent root = loader.load();
+
+        // Obtenez la fenêtre principale à partir de la scène actuelle
+        Stage currentStage = (Stage) currentScene.getWindow();
+
+        // Remplacez le contenu de la fenêtre principale avec la nouvelle page
+        Scene newScene = new Scene(root);
+        currentStage.setScene(newScene);
+
+        // Facultatif : définissez des paramètres supplémentaires pour la nouvelle scène ou le nouveau stage
+        currentStage.show();
     }
 
     /**
@@ -191,6 +233,17 @@ public class MainController {
         colParution.setCellValueFactory(new PropertyValueFactory<>("parution"));
         colColonne.setCellValueFactory(new PropertyValueFactory<>("colonne"));
         colRangee.setCellValueFactory(new PropertyValueFactory<>("rangee"));
+        colEtat.setCellValueFactory(cellData -> {
+            Livre livre = cellData.getValue();
+            boolean etat = livre.getEtat();
+            String etatString;
+            if(etat == false){
+                etatString = "Prété";
+            }else {
+                etatString = "Disponible";
+            }
+            return new SimpleStringProperty(etatString);
+        });
 
         // Configurer la colonne "Auteur" pour afficher le nom et prénom de l'auteur
         colAuteur.setCellValueFactory(cellData -> {

@@ -52,7 +52,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="480.0" prefWidth="1153.0" xmlns="http://javafx.com/javafx/19.0.2.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lotun.gestionprojetagilelotun.controllers.MainController">
+<VBox prefHeight="480.0" prefWidth="1220.0" xmlns="http://javafx.com/javafx/19.0.2.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lotun.gestionprojetagilelotun.controllers.MainController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="Fichier">
             <MenuItem mnemonicParsing="false" onAction="#openFile" text="Ouvrir" />
@@ -66,9 +66,12 @@
         <Menu mnemonicParsing="false" text="About">
             <MenuItem mnemonicParsing="false" onAction="#showAbout" text="Infos" />
         </Menu>
+        <Menu text="Déconnexion" >
+            <MenuItem mnemonicParsing="false" onAction="#deconnexion" text="Déconnexion" />
+        </Menu>
     </MenuBar>
     <AnchorPane prefHeight="454.0" prefWidth="970.0" VBox.vgrow="ALWAYS">
-        <TableView fx:id="tableViewLivres" layoutX="14.0" layoutY="14.0" prefHeight="344.0" prefWidth="594.0">
+        <TableView fx:id="tableViewLivres" layoutX="14.0" layoutY="14.0" prefHeight="344.0" prefWidth="670">
             <columns>
                 <TableColumn fx:id="colTitre" prefWidth="128.0" text="Titre" />
                 <TableColumn fx:id="colAuteur" prefWidth="132.79998779296875" text="Auteur" />
@@ -76,11 +79,12 @@
                 <TableColumn fx:id="colParution" prefWidth="71.99993896484375" text="Parution" />
                 <TableColumn fx:id="colColonne" minWidth="4.800048828125" prefWidth="57.5999755859375" text="Colonne" />
                 <TableColumn fx:id="colRangee" prefWidth="51.199951171875" text="Rangée" />
+                <TableColumn fx:id="colEtat" prefWidth="75.0" text="Etat" />
             </columns>
         </TableView>
-        <Button layoutX="499.0" layoutY="395.0" mnemonicParsing="false" onAction="#creerLivre" prefWidth="37.0" text="+" />
-        <Button layoutX="552.0" layoutY="395.0" mnemonicParsing="false" onAction="#supprimerLivre" prefHeight="26.0" prefWidth="47.0" text="-" />
-        <Pane layoutX="629.0" layoutY="14.0" prefHeight="413.0" prefWidth="254.0" AnchorPane.rightAnchor="271.0">
+        <Button fx:id="buttonAdd" layoutX="499.0" layoutY="395.0" mnemonicParsing="false" onAction="#creerLivre" prefWidth="37.0" text="+" />
+        <Button fx:id="buttonSup" layoutX="552.0" layoutY="395.0" mnemonicParsing="false" onAction="#supprimerLivre" prefHeight="26.0" prefWidth="47.0" text="-" />
+        <Pane fx:id="paneAjoutLivre" layoutX="629.0" layoutY="14.0" prefHeight="413.0" prefWidth="254.0" AnchorPane.rightAnchor="250.0">
             <HBox layoutX="14.0" layoutY="14.0" prefHeight="26.0" prefWidth="228.0">
                 <padding>
                     <Insets bottom="10.0" />
@@ -177,7 +181,7 @@
             </HBox>
             <Button layoutX="189.0" layoutY="367.0" mnemonicParsing="false" onAction="#modifierLivre" text="Valider" />
         </Pane>
-        <ImageView fx:id="bookCoverImageView" fitHeight="293.0" fitWidth="205.0" layoutX="911.0" layoutY="26.0" onMouseReleased="#changeImageURL" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="911.0">
+        <ImageView fx:id="bookCoverImageView" fitHeight="293.0" fitWidth="205.0" layoutX="911.0" layoutY="26.0" onMouseReleased="#changeImageURL" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="965.0">
             <Image url="@image-non-disponible.jpg" />
          <cursor>
             <Cursor fx:constant="HAND" />
