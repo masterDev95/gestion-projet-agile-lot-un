@@ -13,6 +13,7 @@ public class Auteur {
      * Représente un auteur de livre.
      */
     public Auteur() {
+        // Empty constructor
     }
 
     /**
