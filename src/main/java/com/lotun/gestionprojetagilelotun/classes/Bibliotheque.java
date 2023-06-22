@@ -24,6 +24,7 @@ public class Bibliotheque {
      * Classe représentant une bibliothèque contenant une liste de livres.
      */
     public Bibliotheque() {
+        // Empty constructor
     }
 
     /**

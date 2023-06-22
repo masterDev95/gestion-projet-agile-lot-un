@@ -27,6 +27,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitWidthDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
 /**
  * Contrôleur principal pour la gestion de livres.
@@ -288,6 +303,90 @@ public class MainController {
             dao = new BibliothequeDAO(selectedFile);
             saveFile();
         }
+    }
+
+    @FXML
+    protected  void createPDf() throws IOException {
+        var nvBibliotheque = new Bibliotheque();
+        nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
+        PDDocument document = new PDDocument();
+
+        // Création d'une page de garde
+        PDPage coverPage = new PDPage(PDRectangle.A4);
+        document.addPage(coverPage);
+
+        // Ajout du contenu de la page de garde
+        PDPageContentStream coverContent = new PDPageContentStream(document, coverPage);
+        coverContent.beginText();
+        coverContent.setFont(PDType1Font.HELVETICA_BOLD, 20);
+        coverContent.newLineAtOffset(100, 700);
+        coverContent.showText("Mon Livre");
+        coverContent.endText();
+        coverContent.close();
+
+        // Création du sommaire
+        PDDocumentOutline outline = new PDDocumentOutline();
+        document.getDocumentCatalog().setDocumentOutline(outline);
+
+        PDOutlineItem rootItem = new PDOutlineItem();
+        rootItem.setTitle("Sommaire");
+
+        // Ajout des éléments au sommaire
+        PDOutlineItem chapter1 = new PDOutlineItem();
+        chapter1.setTitle("Chapitre 1");
+        chapter1.setDestination(createDestination(document, coverPage));
+        rootItem.addLast(chapter1);
+
+        PDOutlineItem chapter2 = new PDOutlineItem();
+        chapter2.setTitle("Chapitre 2");
+        chapter2.setDestination(createDestination(document, coverPage));
+        rootItem.addLast(chapter2);
+
+        outline.addLast(rootItem);
+
+        // Ajout des liens cliquables sur la page de garde
+        addClickableLink(coverPage, document, chapter1);
+        addClickableLink(coverPage, document, chapter2);
+
+        // Sauvegarde du document
+        document.save("C:\\Users\\kakas\\Downloads\\testPDF.pdf");
+        document.close();
+
+        System.out.println("Le fichier PDF a été généré avec succès.");
+        // Sauvegarde du document
+    }
+    private static PDPageDestination createDestination(PDDocument document, PDPage targetPage) {
+        PDPageXYZDestination destination = new PDPageXYZDestination();
+        destination.setPage(targetPage);
+        destination.setZoom(1);
+        document.addPage(targetPage);
+        return destination;
+    }
+
+    // Méthode utilitaire pour ajouter un lien cliquable sur une page
+    private static void addClickableLink(PDPage page, PDDocument document, PDOutlineItem item) throws IOException {
+        PDAnnotationLink annotation = new PDAnnotationLink();
+        annotation.setDestination(item.getDestination());
+        annotation.setBorderStyle(new PDBorderStyleDictionary());
+        annotation.setColor(new PDColor(new float[]{0, 0, 1}, PDDeviceRGB.INSTANCE));
+
+
+        PDRectangle rect = new PDRectangle();
+        rect.setLowerLeftX(100);
+        rect.setLowerLeftY(500);
+        rect.setUpperRightX(200);
+        rect.setUpperRightY(520);
+        annotation.setRectangle(rect);
+
+        page.getAnnotations().add(annotation);
+
+        PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
+        contentStream.beginText();
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+        contentStream.newLineAtOffset(100, 510); // Coordonnées du lien
+        contentStream.showText(item.getTitle());
+        contentStream.endText();
+        contentStream.close();
     }
 
     /**
