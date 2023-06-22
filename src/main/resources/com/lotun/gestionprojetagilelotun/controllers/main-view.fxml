@@ -178,7 +178,7 @@
             <Button layoutX="189.0" layoutY="367.0" mnemonicParsing="false" onAction="#modifierLivre" text="Valider" />
         </Pane>
         <ImageView fx:id="bookCoverImageView" fitHeight="293.0" fitWidth="205.0" layoutX="911.0" layoutY="26.0" onMouseReleased="#changeImageURL" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="911.0">
-            <Image url="@controllers/image-non-disponible.jpg" />
+            <Image url="@image-non-disponible.jpg" />
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>

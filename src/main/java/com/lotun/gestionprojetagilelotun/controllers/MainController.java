@@ -401,6 +401,7 @@ public class MainController {
         stage.show();
     }
 
+
     /**
      * Crée un nouveau livre.
      */
