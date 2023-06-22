@@ -61,6 +61,7 @@
         <Menu mnemonicParsing="false" text="Edit">
             <MenuItem mnemonicParsing="false" onAction="#saveFile" text="Sauvegarder" />
             <MenuItem mnemonicParsing="false" onAction="#saveAsFile" text="Sauvegarder sous..." />
+            <MenuItem mnemonicParsing="false" onAction="#createPDf" text="Sauvegarde PDF"/>
         </Menu>
         <Menu mnemonicParsing="false" text="About">
             <MenuItem mnemonicParsing="false" onAction="#showAbout" text="Infos" />

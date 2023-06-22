@@ -3,6 +3,7 @@ module com.lotun.gestionprojetagilelotun {
     requires javafx.fxml;
     requires jakarta.xml.bind;
     requires java.sql;
+    requires org.apache.pdfbox;
 
     opens com.lotun.gestionprojetagilelotun to javafx.fxml;
     opens com.lotun.gestionprojetagilelotun.controllers to javafx.fxml;
