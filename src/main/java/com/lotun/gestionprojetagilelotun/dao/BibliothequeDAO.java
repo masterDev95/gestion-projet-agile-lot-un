@@ -1,6 +1,5 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
-import com.lotun.gestionprojetagilelotun.classes.Auteur;
 import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
 import com.lotun.gestionprojetagilelotun.classes.Livre;
 import jakarta.xml.bind.JAXBContext;
@@ -73,36 +72,27 @@ public class BibliothequeDAO {
         Bibliotheque bibliotheque = new Bibliotheque();
         List<Livre> livresRecuperes = new ArrayList<>();
 
-        // Création d'une instruction SQL
-        Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM livre");
 
-        // Exécution d'une requête
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM livre");
+            while (resultSet.next()) {
+                var livre = new Livre();
+                livre.setTitre(resultSet.getString("titre"));
+                livre.setParution(resultSet.getInt("parution"));
+                livre.setRangee(resultSet.getInt("rangee"));
+                livre.setColonne(resultSet.getInt("colonne"));
+                livre.setUrlImage(resultSet.getString("urlImage"));
+                livre.setAuteur(AuteurDAO.getAuteurFromDBById(resultSet.getInt("auteurId")));
+                livre.setPresentation(resultSet.getString("presentation"));
+                livre.setEtat(resultSet.getBoolean("etat"));
+                livresRecuperes.add(livre);
+            }
 
-        // Traitement des résultats
-        while (resultSet.next()) {
-            // Lire les valeurs des colonnes
-            var livre = new Livre();
-            livre.setTitre(resultSet.getString("titre"));
-            livre.setParution(resultSet.getInt("parution"));
-            livre.setRangee(resultSet.getInt("rangee"));
-            livre.setColonne(resultSet.getInt("colonne"));
-            livre.setUrlImage(resultSet.getString("urlImage"));
-            livre.setAuteur(AuteurDAO.getAuteurFromDBById(resultSet.getInt("auteurId")));
-            livre.setPresentation(resultSet.getString("presentation"));
-            livre.setEtat(resultSet.getBoolean("etat"));
-
-            // Faire quelque chose avec les valeurs
-            livresRecuperes.add(livre);
-        }
+            resultSet.close();
+        } // La ressource statement sera automatiquement fermée ici, même en cas d'exception
 
         bibliotheque.setLivres(livresRecuperes);
-
-        // Fermeture des ressources
-        resultSet.close();
-        statement.close();
         connection.close();
-
         return bibliotheque;
     }
 
@@ -152,16 +142,17 @@ public class BibliothequeDAO {
 
     private static void insertLivre(Livre livre, int auteurId, Connection connection) throws SQLException {
         String query = "INSERT INTO livre (titre, auteurId, presentation, parution, colonne, rangee, etat, urlImage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, livre.getTitre());
-        statement.setInt(2, auteurId);
-        statement.setString(3, livre.getPresentation());
-        statement.setInt(4, livre.getParution());
-        statement.setInt(5, livre.getColonne());
-        statement.setInt(6, livre.getRangee());
-        statement.setBoolean(7, livre.getEtat());
-        statement.setString(8, livre.getUrlImage());
-        statement.executeUpdate();
-        statement.close();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, livre.getTitre());
+            statement.setInt(2, auteurId);
+            statement.setString(3, livre.getPresentation());
+            statement.setInt(4, livre.getParution());
+            statement.setInt(5, livre.getColonne());
+            statement.setInt(6, livre.getRangee());
+            statement.setBoolean(7, livre.getEtat());
+            statement.setString(8, livre.getUrlImage());
+            statement.executeUpdate();
+        } // La ressource statement sera automatiquement fermée ici, même en cas d'exception
     }
 }
