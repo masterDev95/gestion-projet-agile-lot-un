@@ -1,4 +1,4 @@
-package com.lotun.gestionprojetagilelotun.classes;
+package com.lotun.gestionprojetagilelotun.models;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BibliothequeTest {
 
     @Test
-    void testGetLivres() {
+    void testLivres() {
         // Créer une liste de livres pour la bibliothèque
         List<Livre> livres = new ArrayList<>();
         Livre livre1 = new Livre();

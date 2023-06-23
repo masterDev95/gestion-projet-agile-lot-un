@@ -1,6 +1,6 @@
 package com.lotun.gestionprojetagilelotun.controllers;
 
-import com.lotun.gestionprojetagilelotun.classes.Session;
+import com.lotun.gestionprojetagilelotun.models.Session;
 import com.lotun.gestionprojetagilelotun.dao.ConnectionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

@@ -1,6 +1,6 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
-import com.lotun.gestionprojetagilelotun.classes.Auteur;
+import com.lotun.gestionprojetagilelotun.models.Auteur;
 
 import java.sql.*;
 

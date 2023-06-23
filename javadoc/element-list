@@ -1,6 +1,6 @@
 module:com.lotun.gestionprojetagilelotun
 com.lotun.gestionprojetagilelotun
-com.lotun.gestionprojetagilelotun.classes
+com.lotun.gestionprojetagilelotun.models
 com.lotun.gestionprojetagilelotun.console
 com.lotun.gestionprojetagilelotun.controllers
 com.lotun.gestionprojetagilelotun.dao

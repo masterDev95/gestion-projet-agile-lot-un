@@ -1,9 +1,9 @@
 package com.lotun.gestionprojetagilelotun.controllers;
 
-import com.lotun.gestionprojetagilelotun.classes.Auteur;
-import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
-import com.lotun.gestionprojetagilelotun.classes.Livre;
-import com.lotun.gestionprojetagilelotun.classes.Session;
+import com.lotun.gestionprojetagilelotun.models.Auteur;
+import com.lotun.gestionprojetagilelotun.models.Bibliotheque;
+import com.lotun.gestionprojetagilelotun.models.Livre;
+import com.lotun.gestionprojetagilelotun.models.Session;
 import com.lotun.gestionprojetagilelotun.dao.BibliothequeDAO;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;

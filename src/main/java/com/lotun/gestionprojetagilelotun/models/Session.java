@@ -1,4 +1,4 @@
-package com.lotun.gestionprojetagilelotun.classes;
+package com.lotun.gestionprojetagilelotun.models;
 
 public class Session {
     private static String username;

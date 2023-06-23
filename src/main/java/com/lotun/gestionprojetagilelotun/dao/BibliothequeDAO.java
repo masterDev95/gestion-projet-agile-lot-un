@@ -1,7 +1,7 @@
 package com.lotun.gestionprojetagilelotun.dao;
 
-import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
-import com.lotun.gestionprojetagilelotun.classes.Livre;
+import com.lotun.gestionprojetagilelotun.models.Bibliotheque;
+import com.lotun.gestionprojetagilelotun.models.Livre;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -11,7 +11,6 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Classe permettant l'accès aux données de la bibliothèque stockées dans un fichier XML.

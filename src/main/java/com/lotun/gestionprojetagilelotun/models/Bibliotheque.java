@@ -1,4 +1,4 @@
-package com.lotun.gestionprojetagilelotun.classes;
+package com.lotun.gestionprojetagilelotun.models;
 
 import java.util.List;
 

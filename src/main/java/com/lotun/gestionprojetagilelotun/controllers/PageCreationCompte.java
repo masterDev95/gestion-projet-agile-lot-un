@@ -1,9 +1,6 @@
 package com.lotun.gestionprojetagilelotun.controllers;
 
-import com.lotun.gestionprojetagilelotun.classes.Bibliotheque;
-import com.lotun.gestionprojetagilelotun.classes.Livre;
-import com.lotun.gestionprojetagilelotun.classes.Role;
-import com.lotun.gestionprojetagilelotun.dao.AuteurDAO;
+import com.lotun.gestionprojetagilelotun.models.Role;
 import com.lotun.gestionprojetagilelotun.dao.ConnectionManager;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -15,7 +12,6 @@ import javafx.util.StringConverter;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PageCreationCompte {
