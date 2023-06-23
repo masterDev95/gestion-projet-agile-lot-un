@@ -4,6 +4,8 @@ package com.lotun.gestionprojetagilelotun.classes;
  * Cette classe représente un livre.
  */
 public class Livre {
+    /** L'id du livre. */
+    int id;
     /** Le titre du livre */
     String titre;
     /** L'auteur du livre */
@@ -18,6 +20,8 @@ public class Livre {
     int rangee;
     /** L'URL de l'image de couverture du livre */
     String urlImage;
+
+    /** Booléen sur l'état du livre */
     Boolean etat;
 
     /**
@@ -25,6 +29,22 @@ public class Livre {
      */
     public Livre() {
         // Empty constructor
+    }
+
+    /**
+     * Retourne l'id du livre.
+     * @return L'id du livre.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Modifie l'id du livre
+     * @param id - La nouvelle id du livre.
+     */
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -154,10 +174,18 @@ public class Livre {
         this.urlImage = urlImage;
     }
 
+    /**
+     * Retourne l'état du livre
+     * @return L'état du livre
+     */
     public Boolean getEtat() {
         return etat;
     }
 
+    /**
+     * Modifie l'état du livre
+     * @param etat - Le nouvel état du livre
+     */
     public void setEtat(Boolean etat) {
         this.etat = etat;
     }
