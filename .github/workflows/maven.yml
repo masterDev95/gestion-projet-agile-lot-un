@@ -35,4 +35,5 @@ jobs:
       run: mvn test
     - name: Analyze with SonarCloud
       run: mvn -B verify sonar:sonar -Dsonar.projectKey=masterDev95_gestion-projet-agile-lot-un -Dsonar.organization=masterdev95 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-    
+    - name: Generate SBOM
+      run: mvn verify
