@@ -31,6 +31,14 @@ public class Livre {
         // Empty constructor
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     /**
      * Retourne l'id du livre.
      * @return L'id du livre.
