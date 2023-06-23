@@ -322,10 +322,6 @@ public class MainController {
             var nvBibliotheque = new Bibliotheque();
             nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
 
-            if (liveMode) {
-                BibliothequeDAO.reecrireListeLivres(nvBibliotheque.getLivres());
-            }
-
             // Mettre à jour la bibliothèque dans le fichier XML en utilisant l'objet DAO
             dao.updateBibliotheque(nvBibliotheque);
         } else {
@@ -470,11 +466,14 @@ public class MainController {
      * Supprime le livre sélectionné.
      */
     @FXML
-    protected void supprimerLivre() {
+    protected void supprimerLivre() throws SQLException {
         // Récupération de l'index de l'élément sélectionné
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
         // Vérification qu'un élément est bien sélectionné
         if (selectedIndex != -1) {
+            if(liveMode == true){
+                BibliothequeDAO.supLivre(tableViewLivres.getItems().get(selectedIndex).getId());
+            }
             // Création d'un nouvel objet Livre
             tableViewLivres.getItems().remove(selectedIndex);
             // Enlève la selection de l'élément
@@ -482,6 +481,7 @@ public class MainController {
             // Mise à jour de l'affichage dans le TableView
             tableViewLivres.refresh();
             clearChamps();
+
         } else {
             // Afficher un message d'erreur si aucun élément n'est sélectionné
             showDialog("Veuillez sélectionner un livre à supprimer.");
@@ -535,10 +535,9 @@ public class MainController {
      *
      * @throws NumberFormatException si le texte dans les champs Parution, Colonne et Rangée ne peut pas être converti en entier.
      */
-    private void updateLivreTableView(Livre livreModifie) {
+    private void updateLivreTableView(Livre livreModifie) throws SQLException {
         // Création d'un nouvel objet Auteur
         var auteur = new Auteur();
-
         // Récupération des données modifiées dans les champs de texte
         auteur.setNom(champNomAuteur.getText());
         auteur.setPrenom(champPrenomAuteur.getText());
@@ -550,6 +549,9 @@ public class MainController {
         livreModifie.setColonne(Integer.parseInt(champColonne.getText()));
         livreModifie.setRangee(Integer.parseInt(champRangee.getText()));
         livreModifie.setEtat(boutonDisponible.isSelected());
+        if(liveMode == true){
+            BibliothequeDAO.ajoutLivre(livreModifie);
+        }
     }
 
     /**

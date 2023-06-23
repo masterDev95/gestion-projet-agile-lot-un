@@ -4,6 +4,7 @@ package com.lotun.gestionprojetagilelotun.classes;
  * Cette classe représente un livre.
  */
 public class Livre {
+    int id;
     /** Le titre du livre */
     String titre;
     /** L'auteur du livre */
@@ -24,6 +25,14 @@ public class Livre {
      * Cette classe représente un livre.
      */
     public Livre() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
