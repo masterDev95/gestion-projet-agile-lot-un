@@ -66,7 +66,6 @@ public class PageCreationCompte {
 
         // Fermeture des ressources
         resultSet.close();
-        statement.close();
         connection.close();
 
         // Ajouter les rôles à la ChoiceBox
