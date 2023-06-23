@@ -40,39 +40,40 @@ public class PageConnexion {
     @FXML
     protected void authenticate() throws SQLException, IOException {
         Connection connection = ConnectionManager.getDbConnection();
-        String query = "SELECT * FROM user WHERE identifiant = ? AND password = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, identifiant.getText());
-        statement.setString(2,password.getText());
-        ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE identifiant = ? AND password = ?")) {
 
-        if (resultSet.next()) {
-            Session.setUsername(identifiant.getText());
-            if(resultSet.getInt("idrole") == 1){
-                Session.setGerant(true);
-            }else {
-                Session.setGerant(false);
+            statement.setString(1, identifiant.getText());
+            statement.setString(2, password.getText());
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                Session.setUsername(identifiant.getText());
+                if (resultSet.getInt("idrole") == 1) {
+                    Session.setGerant(true);
+                } else {
+                    Session.setGerant(false);
+                }
+
+                Scene currentScene = connexionButton.getScene();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("main-view.fxml"));
+                Parent root = loader.load();
+
+                // Obtenez la fenêtre principale à partir de la scène actuelle
+                Stage currentStage = (Stage) currentScene.getWindow();
+
+                // Remplacez le contenu de la fenêtre principale avec la nouvelle page
+                Scene newScene = new Scene(root);
+                currentStage.setScene(newScene);
+
+                // Facultatif : définissez des paramètres supplémentaires pour la nouvelle scène ou le nouveau stage
+                currentStage.show();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur de connexion");
+                alert.setHeaderText("Identifiants incorrects");
+                alert.setContentText("Veuillez vérifier votre nom d'utilisateur et votre mot de passe.");
+                alert.showAndWait();
             }
-            Scene currentScene = connexionButton.getScene();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("main-view.fxml"));
-            Parent root = loader.load();
-
-            // Obtenez la fenêtre principale à partir de la scène actuelle
-            Stage currentStage = (Stage) currentScene.getWindow();
-
-            // Remplacez le contenu de la fenêtre principale avec la nouvelle page
-            Scene newScene = new Scene(root);
-            currentStage.setScene(newScene);
-
-            // Facultatif : définissez des paramètres supplémentaires pour la nouvelle scène ou le nouveau stage
-            currentStage.show();
-
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur de connexion");
-            alert.setHeaderText("Identifiants incorrects");
-            alert.setContentText("Veuillez vérifier votre nom d'utilisateur et votre mot de passe.");
-            alert.showAndWait();
         }
     }
 }

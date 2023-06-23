@@ -177,27 +177,29 @@ public class BibliothequeDAO {
 
     private static void modifierLivre(Livre livre, int auteurId, Connection connection) throws SQLException {
         String updateQuery = "UPDATE livre SET titre = ?, auteurId = ?, presentation = ?, parution = ?, colonne = ?, rangee = ?, etat = ?, urlImage = ? WHERE idlivre = ?";
-        PreparedStatement statement = connection.prepareStatement(updateQuery);
-        statement.setString(1, livre.getTitre());
-        statement.setInt(2, auteurId);
-        statement.setString(3, livre.getPresentation());
-        statement.setInt(4, livre.getParution());
-        statement.setInt(5, livre.getColonne());
-        statement.setInt(6, livre.getRangee());
-        statement.setBoolean(7, livre.getEtat());
-        statement.setString(8, livre.getUrlImage());
-        statement.setInt(9,livre.getId());
-        statement.executeUpdate();
-        statement.close();
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)){
+            statement.setString(1, livre.getTitre());
+            statement.setInt(2, auteurId);
+            statement.setString(3, livre.getPresentation());
+            statement.setInt(4, livre.getParution());
+            statement.setInt(5, livre.getColonne());
+            statement.setInt(6, livre.getRangee());
+            statement.setBoolean(7, livre.getEtat());
+            statement.setString(8, livre.getUrlImage());
+            statement.setInt(9,livre.getId());
+            statement.executeUpdate();
+        }
+
     }
 
     public static void supLivre(int id) throws SQLException {
         Connection connection = ConnectionManager.getDbConnection();
         String query = "DELETE FROM livre WHERE idlivre = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, id);
-        statement.executeUpdate();
-        statement.close();
+        try(PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, id);
+            statement.executeUpdate();
+
+        }
         connection.close();
     }
 }

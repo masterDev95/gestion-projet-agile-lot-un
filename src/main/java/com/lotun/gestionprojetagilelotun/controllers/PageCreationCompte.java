@@ -43,7 +43,7 @@ public class PageCreationCompte {
         Role role = new Role();
 
         // Création d'une instruction SQL
-        Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
 
         // Exécution d'une requête
         ResultSet resultSet = statement.executeQuery("SELECT * FROM role");
@@ -66,7 +66,6 @@ public class PageCreationCompte {
 
         // Fermeture des ressources
         resultSet.close();
-        statement.close();
         connection.close();
 
         // Ajouter les rôles à la ChoiceBox
@@ -87,6 +86,7 @@ public class PageCreationCompte {
                 return null;
             }
         });
+        }
     }
 
     @FXML
@@ -94,19 +94,18 @@ public class PageCreationCompte {
         Connection connection = ConnectionManager.getDbConnection();
 
         String query = "INSERT INTO user (identifiant, password,idrole) VALUES (?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, identifiantText.getText());
-        statement.setString(2, passwordText.getText());
-        statement.setInt(3, roleChoiceBox.getValue().getId());
+        try(PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1, identifiantText.getText());
+            statement.setString(2, passwordText.getText());
+            statement.setInt(3, roleChoiceBox.getValue().getId());
+            statement.executeUpdate();
 
-        statement.executeUpdate();
-        statement.close();
+            connection.close();
 
-        connection.close();
-
-        Scene currentScene = creationButton.getScene();
-        Stage currentStage = (Stage) currentScene.getWindow();
-        currentStage.close();
+            Scene currentScene = creationButton.getScene();
+            Stage currentStage = (Stage) currentScene.getWindow();
+            currentStage.close();
+        }
 
     }
 
