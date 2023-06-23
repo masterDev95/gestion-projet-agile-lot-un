@@ -11,6 +11,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Classe permettant l'accès aux données de la bibliothèque stockées dans un fichier XML.
@@ -31,7 +32,8 @@ public class BibliothequeDAO {
 
     }
 
-    public BibliothequeDAO(){}
+    public BibliothequeDAO() {
+    }
 
     /**
      * Renvoie le fichier XML associé à l'instance de la classe BibliothequeDAO.
@@ -77,6 +79,7 @@ public class BibliothequeDAO {
 
             while (resultSet.next()) {
                 var livre = new Livre();
+                livre.setId(resultSet.getInt("idlivre"));
                 livre.setTitre(resultSet.getString("titre"));
                 livre.setParution(resultSet.getInt("parution"));
                 livre.setRangee(resultSet.getInt("rangee"));
@@ -88,8 +91,27 @@ public class BibliothequeDAO {
                 livresRecuperes.add(livre);
             }
 
+        // Traitement des résultats
+        while (resultSet.next()) {
+            // Lire les valeurs des colonnes
+            var livre = new Livre();
+            livre.setId(resultSet.getInt("idlivre"));
+            livre.setTitre(resultSet.getString("titre"));
+            livre.setParution(resultSet.getInt("parution"));
+            livre.setRangee(resultSet.getInt("rangee"));
+            livre.setColonne(resultSet.getInt("colonne"));
+            livre.setUrlImage(resultSet.getString("urlImage"));
+            livre.setAuteur(AuteurDAO.getAuteurFromDBById(resultSet.getInt("auteurId")));
+            livre.setPresentation(resultSet.getString("presentation"));
+            livre.setEtat(resultSet.getBoolean("etat"));
+
+            // Faire quelque chose avec les valeurs
+            livresRecuperes.add(livre);
+        }
+
             resultSet.close();
         } // La ressource statement sera automatiquement fermée ici, même en cas d'exception
+
 
         bibliotheque.setLivres(livresRecuperes);
         connection.close();
@@ -113,28 +135,25 @@ public class BibliothequeDAO {
         }
     }
 
-    public static void reecrireListeLivres(List<Livre> listeLivres) throws SQLException {
+    public static void ajoutLivre(Livre livre) throws SQLException {
         Connection connection = ConnectionManager.getDbConnection();
-
-        // Supprimer tous les enregistrements de la table "livre"
-        String deleteQuery = "DELETE FROM livre";
-        PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
-        deleteStatement.executeUpdate();
-        deleteStatement.close();
-
         // Réécrire la liste des livres dans la table "livre"
-        for (Livre livre : listeLivres) {
-            // Vérifier si l'auteur existe dans la table "auteur"
-            int auteurId = AuteurDAO.getAuteurId(livre.getAuteur(), connection);
+        // Vérifier si l'auteur existe dans la table "auteur"
+        int auteurId = AuteurDAO.getAuteurId(livre.getAuteur(), connection);
 
-            // Si l'auteur n'existe pas, l'insérer dans la table "auteur"
-            if (auteurId == -1) {
-                auteurId = AuteurDAO.insertAuteur(livre.getAuteur(), connection);
-            }
+        // Si l'auteur n'existe pas, l'insérer dans la table "auteur"
+        if (auteurId == -1) {
+            auteurId = AuteurDAO.insertAuteur(livre.getAuteur(), connection);
+        }
+        // Insérer le livre dans la table "livre" avec l'ID de l'auteur
+        if(livre.getId() != 0){
+            modifierLivre(livre, auteurId, connection);
 
-            // Insérer le livre dans la table "livre" avec l'ID de l'auteur
+        }else{
             insertLivre(livre, auteurId, connection);
         }
+
+
 
         // Fermer la connexion
         connection.close();
@@ -154,5 +173,31 @@ public class BibliothequeDAO {
             statement.setString(8, livre.getUrlImage());
             statement.executeUpdate();
         } // La ressource statement sera automatiquement fermée ici, même en cas d'exception
+    }
+
+    private static void modifierLivre(Livre livre, int auteurId, Connection connection) throws SQLException {
+        String updateQuery = "UPDATE livre SET titre = ?, auteurId = ?, presentation = ?, parution = ?, colonne = ?, rangee = ?, etat = ?, urlImage = ? WHERE idlivre = ?";
+        PreparedStatement statement = connection.prepareStatement(updateQuery);
+        statement.setString(1, livre.getTitre());
+        statement.setInt(2, auteurId);
+        statement.setString(3, livre.getPresentation());
+        statement.setInt(4, livre.getParution());
+        statement.setInt(5, livre.getColonne());
+        statement.setInt(6, livre.getRangee());
+        statement.setBoolean(7, livre.getEtat());
+        statement.setString(8, livre.getUrlImage());
+        statement.setInt(9,livre.getId());
+        statement.executeUpdate();
+        statement.close();
+    }
+
+    public static void supLivre(int id) throws SQLException {
+        Connection connection = ConnectionManager.getDbConnection();
+        String query = "DELETE FROM livre WHERE idlivre = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setInt(1, id);
+        statement.executeUpdate();
+        statement.close();
+        connection.close();
     }
 }

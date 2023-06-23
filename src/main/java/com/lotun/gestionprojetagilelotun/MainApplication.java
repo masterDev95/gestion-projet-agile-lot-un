@@ -26,7 +26,7 @@ public class MainApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("controllers/PageConnexion.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("La folle B I B L I O");
         stage.setScene(scene);
