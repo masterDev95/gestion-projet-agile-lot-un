@@ -25,6 +25,7 @@ public class Livre {
      * Cette classe représente un livre.
      */
     public Livre() {
+        // Empty constructor
     }
 
     public int getId() {
