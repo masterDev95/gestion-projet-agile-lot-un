@@ -52,16 +52,20 @@ public class MainController {
     private static final String FILE_EXTENSION = "*.xml";
     private static final String DEFAULT_IMAGE_PATH = "image-non-disponible.jpg";
 
+
     @FXML
     private Pane paneAjoutLivre;
     @FXML
     private Button buttonAdd;
     @FXML
     private Button buttonSup;
+    /** Bouton bascule permettant de passer entre le mode en direct et le mode hors ligne. */
     @FXML
     private Button toggleLiveBouton;
+    /** Bouton radio représentant l'état "Prêté". */
     @FXML
     private RadioButton boutonPrete;
+    /** Bouton radio représentant l'état "Disponible". */
     @FXML
     private RadioButton boutonDisponible;
     /**
@@ -153,7 +157,9 @@ public class MainController {
      * Accès aux opérations sur la base de données.
      */
     private BibliothequeDAO dao;
+    /** Mode en direct : indique si l'application est en mode en direct ou hors ligne. */
     private Boolean liveMode;
+    /** Logger pour la journalisation des événements et des erreurs. */
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
@@ -358,6 +364,13 @@ public class MainController {
         }
     }
 
+    /**
+     * Crée un fichier PDF à partir des livres affichés dans le TableView.
+     * Le fichier PDF généré contient une page de garde avec le titre "Mon Livre".
+     * Le fichier est sauvegardé dans le répertoire spécifié.
+     *
+     * @throws IOException en cas d'erreur lors de la manipulation du fichier PDF
+     */
     @FXML
     protected void createPDf() throws IOException {
         var nvBibliotheque = new Bibliotheque();
@@ -379,9 +392,16 @@ public class MainController {
             // Sauvegarde du document
             document.save("C:\\Users\\kakas\\Downloads\\testPDF.pdf");
             logger.info("Le fichier PDF a été généré avec succès.");
-            // Sauvegarde du document
         }
     }
+
+    /**
+     * Crée une destination de page PDPageDestination pour le document spécifié et la page cible.
+     *
+     * @param document   le document PD pour lequel créer la destination
+     * @param targetPage la page cible de la destination
+     * @return la destination de page PDPageDestination créée
+     */
     private static PDPageDestination createDestination(PDDocument document, PDPage targetPage) {
         PDPageXYZDestination destination = new PDPageXYZDestination();
         destination.setPage(targetPage);
@@ -390,7 +410,14 @@ public class MainController {
         return destination;
     }
 
-    // Méthode utilitaire pour ajouter un lien cliquable sur une page
+    /**
+     * Ajoute un lien cliquable sur une page spécifiée dans le document PD.
+     *
+     * @param page      la page sur laquelle ajouter le lien
+     * @param document  le document PD dans lequel ajouter le lien
+     * @param item      l'élément de plan PDOutlineItem avec la destination du lien
+     * @throws IOException en cas d'erreur lors de la manipulation du contenu de la page
+     */
     private static void addClickableLink(PDPage page, PDDocument document, PDOutlineItem item) throws IOException {
         PDAnnotationLink annotation = new PDAnnotationLink();
         annotation.setDestination(item.getDestination());
@@ -623,6 +650,14 @@ public class MainController {
         return false;
     }
 
+    /**
+     * Vérifie si le champ spécifié est vide.
+     * Affiche un message d'erreur et met le focus sur le champ s'il est vide.
+     *
+     * @param champ         le champ à vérifier
+     * @param messageErreur le message d'erreur à afficher si le champ est vide
+     * @return true si le champ est vide, false sinon
+     */
     private boolean isChampVide(TextField champ, String messageErreur) {
         if (champ.getText().trim().isEmpty()) {
             showDialog(messageErreur);
@@ -632,6 +667,14 @@ public class MainController {
         return false;
     }
 
+    /**
+     * Vérifie si le champ spécifié ne contient pas une valeur entière.
+     * Affiche un message d'erreur et met le focus sur le champ s'il ne contient pas une valeur entière.
+     *
+     * @param champ         le champ à vérifier
+     * @param messageErreur le message d'erreur à afficher si le champ ne contient pas une valeur entière
+     * @return true si le champ ne contient pas une valeur entière, false sinon
+     */
     private boolean isChampNonEntier(TextField champ, String messageErreur) {
         String valeur = champ.getText().trim();
         if (!valeur.matches("\\d+")) {
@@ -642,14 +685,33 @@ public class MainController {
         return false;
     }
 
+    /**
+     * Vérifie si l'année de parution spécifiée est au format valide (YYYY).
+     *
+     * @param parution l'année de parution à vérifier
+     * @return true si l'année de parution est au format valide, false sinon
+     */
     private boolean isAnneeValide(String parution) {
         return parution.matches("\\d{4}");
     }
 
+    /**
+     * Vérifie si l'année de parution spécifiée est une année future par rapport à l'année courante.
+     *
+     * @param parution       l'année de parution à vérifier
+     * @param anneeCourante l'année courante à comparer avec l'année de parution
+     * @return true si l'année de parution est une année future, false sinon
+     */
     private boolean isAnneeFuture(String parution, String anneeCourante) {
         return Integer.parseInt(parution) > Integer.parseInt(anneeCourante);
     }
 
+    /**
+     * Méthode gérant le basculement du mode en ligne/hors-ligne.
+     * Met à jour la valeur de liveMode, le texte du bouton et remplit le tableau de livres.
+     *
+     * @throws SQLException en cas d'erreur lors de la récupération de la bibliothèque depuis la base de données
+     */
     @FXML
     protected void toggleLiveMode() throws SQLException {
         liveMode = !liveMode;
@@ -661,6 +723,11 @@ public class MainController {
         remplirTableau(bibliotheque);
     }
 
+    /**
+     * Rempli le tableau de livres avec les livres de la bibliothèque spécifiée.
+     *
+     * @param bibliotheque la bibliothèque contenant les livres à afficher
+     */
     private void remplirTableau(Bibliotheque bibliotheque) {
         // Récup les livres de la bibliothèque
         listesLivres = Objects.requireNonNull(bibliotheque).getLivres();
