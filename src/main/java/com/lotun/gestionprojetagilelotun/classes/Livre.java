@@ -30,30 +30,20 @@ public class Livre {
     public Livre() {
         // Empty constructor
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     /**
      * Retourne l'id du livre.
      * @return L'id du livre.
      */
+
     public int getId() {
         return id;
     }
 
-    /**
-     * Modifie l'id du livre
-     * @param id - La nouvelle id du livre.
-     */
     public void setId(int id) {
         this.id = id;
     }
+
+
 
     /**
      * Retourne le titre du livre.
