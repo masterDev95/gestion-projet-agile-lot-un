@@ -19,6 +19,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,21 +39,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
-import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
-import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
-import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
-import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageFitWidthDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
+import java.util.logging.Logger;
 
 /**
  * Contrôleur principal pour la gestion de livres.
@@ -142,6 +140,7 @@ public class MainController {
      */
     private BibliothequeDAO dao;
     private Boolean liveMode;
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Méthode d'initialisation du contrôleur.
@@ -170,15 +169,12 @@ public class MainController {
                 // Si la touche appuyée est la touche Entrée
                 if (event.getCode() == KeyCode.ENTER) {
                     // On appelle la méthode modifierLivre
-                    try {
-                        modifierLivre();
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+                    modifierLivre();
                 }
             });
         }
     }
+
 
     /**
      * Initialise le TableView avec les données de la bibliothèque et configure les cellules de chaque colonne.
@@ -215,12 +211,17 @@ public class MainController {
                 champParution.setText(Integer.toString(newValue.getParution()));
                 champColonne.setText(Integer.toString(newValue.getColonne()));
                 champRangee.setText(Integer.toString(newValue.getRangee()));
-                (newValue.getEtat() ? boutonDisponible : boutonPrete).setSelected(true);
+
+                if (newValue.getEtat()) {
+                    boutonDisponible.setSelected(true);
+                } else {
+                    boutonPrete.setSelected(true);
+                }
 
                 try {
                     bookCoverImageView.setImage(new Image(newValue.getUrlImage()));
                 } catch (Exception e) {
-                    bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
+                    bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource(DEFAULT_IMAGE_PATH)).toString()));
                 }
             }
         });
@@ -232,12 +233,12 @@ public class MainController {
     @FXML
     protected void openFile() {
         // Obtenir le chemin du dossier de travail courant
-        String defaultPath = System.getProperty("user.dir");
+        String defaultPath = System.getProperty(USER_DIR);
 
         // Configurer le FileChooser pour n'ouvrir que les fichiers XML avec l'extension .xml
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(defaultPath));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", "*.xml"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", FILE_EXTENSION));
 
         // Ouvrir une boîte de dialogue pour sélectionner un fichier à ouvrir
         File selectedFile = fileChooser.showOpenDialog(null);
@@ -269,7 +270,7 @@ public class MainController {
             var nvBibliotheque = new Bibliotheque();
             nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
 
-            if (liveMode) {
+            if (liveMode == true) {
                 BibliothequeDAO.reecrireListeLivres(nvBibliotheque.getLivres());
             }
 
@@ -291,11 +292,11 @@ public class MainController {
      */
     @FXML
     protected void saveAsFile() throws SQLException {
-        String defaultPath = dao == null ? System.getProperty("user.dir") : dao.getFichierXML().getParent();
+        String defaultPath = dao == null ? System.getProperty(USER_DIR) : dao.getFichierXML().getParent();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(defaultPath));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", "*.xml"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichier Bibliothèque (XML)", FILE_EXTENSION));
 
         File selectedFile = fileChooser.showSaveDialog(null);
 
@@ -306,54 +307,28 @@ public class MainController {
     }
 
     @FXML
-    protected  void createPDf() throws IOException {
+    protected void createPDf() throws IOException {
         var nvBibliotheque = new Bibliotheque();
         nvBibliotheque.setLivres(tableViewLivres.getItems().stream().toList());
-        PDDocument document = new PDDocument();
 
-        // Création d'une page de garde
-        PDPage coverPage = new PDPage(PDRectangle.A4);
-        document.addPage(coverPage);
+        try (PDDocument document = new PDDocument()) {
+            // Création d'une page de garde
+            PDPage coverPage = new PDPage(PDRectangle.A4);
+            document.addPage(coverPage);
 
-        // Ajout du contenu de la page de garde
-        PDPageContentStream coverContent = new PDPageContentStream(document, coverPage);
-        coverContent.beginText();
-        coverContent.setFont(PDType1Font.HELVETICA_BOLD, 20);
-        coverContent.newLineAtOffset(100, 700);
-        coverContent.showText("Mon Livre");
-        coverContent.endText();
-        coverContent.close();
+            // Ajout du contenu de la page de garde
+            PDPageContentStream coverContent = new PDPageContentStream(document, coverPage);
+            coverContent.beginText();
+            coverContent.setFont(PDType1Font.HELVETICA_BOLD, 20);
+            coverContent.newLineAtOffset(100, 700);
+            coverContent.showText("Mon Livre");
+            coverContent.endText();
 
-        // Création du sommaire
-        PDDocumentOutline outline = new PDDocumentOutline();
-        document.getDocumentCatalog().setDocumentOutline(outline);
-
-        PDOutlineItem rootItem = new PDOutlineItem();
-        rootItem.setTitle("Sommaire");
-
-        // Ajout des éléments au sommaire
-        PDOutlineItem chapter1 = new PDOutlineItem();
-        chapter1.setTitle("Chapitre 1");
-        chapter1.setDestination(createDestination(document, coverPage));
-        rootItem.addLast(chapter1);
-
-        PDOutlineItem chapter2 = new PDOutlineItem();
-        chapter2.setTitle("Chapitre 2");
-        chapter2.setDestination(createDestination(document, coverPage));
-        rootItem.addLast(chapter2);
-
-        outline.addLast(rootItem);
-
-        // Ajout des liens cliquables sur la page de garde
-        addClickableLink(coverPage, document, chapter1);
-        addClickableLink(coverPage, document, chapter2);
-
-        // Sauvegarde du document
-        document.save("C:\\Users\\kakas\\Downloads\\testPDF.pdf");
-        document.close();
-
-        System.out.println("Le fichier PDF a été généré avec succès.");
-        // Sauvegarde du document
+            // Sauvegarde du document
+            document.save("C:\\Users\\kakas\\Downloads\\testPDF.pdf");
+            logger.info("Le fichier PDF a été généré avec succès.");
+            // Sauvegarde du document
+        }
     }
     private static PDPageDestination createDestination(PDDocument document, PDPage targetPage) {
         PDPageXYZDestination destination = new PDPageXYZDestination();
@@ -407,7 +382,7 @@ public class MainController {
     @FXML
     protected void creerLivre() {
         tableViewLivres.getSelectionModel().clearSelection();
-        bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource("image-non-disponible.jpg")).toString()));
+        bookCoverImageView.setImage(new Image(Objects.requireNonNull(getClass().getResource(DEFAULT_IMAGE_PATH)).toString()));
         champTitre.requestFocus();
         clearChamps();
     }
@@ -442,7 +417,7 @@ public class MainController {
      * avant de mettre à jour l'affichage dans le TableView. Enfin, vide les champs.
      */
     @FXML
-    protected void modifierLivre() throws SQLException {
+    protected void modifierLivre() {
 
         // Récupération de l'index de l'élément sélectionné
         int selectedIndex = tableViewLivres.getSelectionModel().getSelectedIndex();
@@ -563,87 +538,64 @@ public class MainController {
      * @return true si l'un des champs obligatoires est vide ou invalide, false sinon
      */
     private boolean checkChamps() {
-        String titre = champTitre.getText().trim();
-        String prenomAuteur = champPrenomAuteur.getText().trim();
-        String nomAuteur = champNomAuteur.getText().trim();
-        String presentation = champPresentation.getText().trim();
+        if (isChampVide(champTitre, "Le champ titre est vide.")) return true;
+        if (isChampVide(champPrenomAuteur, "Le champ prénom de l'auteur est vide.")) return true;
+        if (isChampVide(champNomAuteur, "Le champ nom de l'auteur est vide.")) return true;
+        if (isChampVide(champPresentation, "Le champ présentation est vide.")) return true;
+        if (isChampVide(champParution, "Le champ parution est vide.")) return true;
+        if (isChampNonEntier(champColonne, "Le champ colonne doit être un nombre entier.")) return true;
+        if (isChampNonEntier(champRangee, "Le champ rangée doit être un nombre entier.")) return true;
+
         String parution = champParution.getText().trim();
-        String colonne = champColonne.getText().trim();
-        String rangee = champRangee.getText().trim();
+        String anneeCourante = String.valueOf(LocalDate.now().getYear());
 
-        if (titre.isEmpty()) {
-            showDialog("Le champ titre est vide.");
-            champTitre.requestFocus();
-            return true;
-        }
-
-        if (prenomAuteur.isEmpty()) {
-            showDialog("Le champ prénom de l'auteur est vide.");
-            champPrenomAuteur.requestFocus();
-            return true;
-        }
-
-        if (nomAuteur.isEmpty()) {
-            showDialog("Le champ nom de l'auteur est vide.");
-            champNomAuteur.requestFocus();
-            return true;
-        }
-
-        if (presentation.isEmpty()) {
-            showDialog("Le champ présentation est vide.");
-            champPresentation.requestFocus();
-            return true;
-        }
-
-        if (parution.isEmpty()) {
-            showDialog("Le champ parution est vide.");
+        if (!isAnneeValide(parution)) {
+            showDialog("Le champ parution doit être une année valide (format : YYYY).");
             champParution.requestFocus();
             return true;
-        } else {
-            String anneeCourante = String.valueOf(LocalDate.now().getYear());
-            if (!parution.matches("\\d{4}")) {
-                showDialog("Le champ parution doit être une année valide (format : YYYY).");
-                champParution.requestFocus();
-                return true;
-            } else if (Integer.parseInt(parution) > Integer.parseInt(anneeCourante)) {
-                showDialog("Le champ parution doit être la même année ou antérieure à l'année courante ("
-                        + anneeCourante + ").");
-                champParution.requestFocus();
-                return true;
-            }
         }
 
-        if (colonne.isEmpty()) {
-            showDialog("Le champ colonne est vide.");
-            champColonne.requestFocus();
+        if (isAnneeFuture(parution, anneeCourante)) {
+            showDialog("Le champ parution doit être la même année ou antérieure à l'année courante (" + anneeCourante + ").");
+            champParution.requestFocus();
             return true;
-        } else {
-            if (!colonne.matches("\\d+")) {
-                showDialog("Le champ colonne doit être un nombre entier.");
-                champColonne.requestFocus();
-                return true;
-            }
-        }
-
-        if (rangee.isEmpty()) {
-            showDialog("Le champ rangée est vide.");
-            champRangee.requestFocus();
-            return true;
-        } else {
-            if (!rangee.matches("\\d+")) {
-                showDialog("Le champ rangée doit être un nombre entier.");
-                champRangee.requestFocus();
-                return true;
-            }
         }
 
         return false;
     }
 
+    private boolean isChampVide(TextField champ, String messageErreur) {
+        if (champ.getText().trim().isEmpty()) {
+            showDialog(messageErreur);
+            champ.requestFocus();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isChampNonEntier(TextField champ, String messageErreur) {
+        String valeur = champ.getText().trim();
+        if (!valeur.matches("\\d+")) {
+            showDialog(messageErreur);
+            champ.requestFocus();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isAnneeValide(String parution) {
+        return parution.matches("\\d{4}");
+    }
+
+    private boolean isAnneeFuture(String parution, String anneeCourante) {
+        return Integer.parseInt(parution) > Integer.parseInt(anneeCourante);
+    }
+
     @FXML
     protected void toggleLiveMode() throws SQLException {
         liveMode = !liveMode;
-        toggleLiveBouton.setText("Passer en mode " + (liveMode ? "hors-ligne" : "en ligne"));
+        String modeText = liveMode ? "hors-ligne" : "en ligne";
+        toggleLiveBouton.setText("Passer en mode " + modeText);
 
         // Remplissage du tableau
         Bibliotheque bibliotheque = BibliothequeDAO.getBibliothequeFromDB();
